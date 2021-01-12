@@ -2,9 +2,9 @@ Get started
 
 Ensure you have Node installed in your system, then
 
-```git clone https://github.com/jroge-uagrm/consultation-forum.git```
+```git clone https://github.com/jroge-uagrm/consultation-forum-mvc.git```
 
-```cd consultation-forum```
+```cd consultation-forum-mvc```
 
 ```npm i```
 
