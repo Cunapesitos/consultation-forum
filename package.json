@@ -1,0 +1,33 @@
+{
+  "name": "consultation-forum",
+  "version": "1.0.0",
+  "description": "This project will be used for ficct students",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev-start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jroge-uagrm/ConsultationForum.git"
+  },
+  "author": "JrogeT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jroge-uagrm/ConsultationForum/issues"
+  },
+  "homepage": "https://github.com/jroge-uagrm/ConsultationForum#readme",
+  "dependencies": {
+    "Validator": "^1.1.2",
+    "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "jwt-simple": "^0.5.6",
+    "moment": "^2.29.1",
+    "mysql": "^2.18.1",
+    "node-static": "^0.7.11",
+    "pejs": "^0.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
