@@ -21,7 +21,7 @@ const publicationController = new PublicationController();
 const commentController = new CommentController();
 const categoryController = new CategoryController();
 
-const host = process.env.APP_HOST || 'localhost';
+const host = process.env.APP_HOST || 'http://localhost';
 const port = process.env.APP_PORT || 3000;
 
 const server = http.createServer((req, res) => {
@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, host, () => {
-    console.log(`Server running at http://${host}:${port}/`);
+    console.log(`Server running at ${host}:${port}/`);
 });
 
 async function handleRequest(req, res) {
