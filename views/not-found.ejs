@@ -1,0 +1,26 @@
+<%{ './master.ejs' }%>
+    <%{ content %>
+        <div class="row align-items-top mt-5 h-100">
+            <div class="col-8 mx-auto">
+                <div class="row align-items-center">
+                    <div class="col-4">
+                        <img src="http://localhost:3000/icon.png" width="100%">
+                    </div>
+                    <div class="col">
+                        <h1 class="border-bottom border-dark">404</h1>
+                        <h2>Ups! this page not exist.</h2>
+                    </div>
+                </div>
+                <div class="row justify-content-end">
+                    <a id="btn-redirect" class="col-3 btn btn-outline-dark" href="#">
+                        My publications
+                    </a>
+                </div>
+            </div>
+        </div>
+        <%} %>
+            <%{ script %>
+                <script>
+                    $('#btn-redirect').attr('href', `/publications/${getFromLocalStorage('user').id}`);
+                </script>
+                <%} %>

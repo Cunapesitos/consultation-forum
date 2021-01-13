@@ -1,0 +1,79 @@
+<%{ '../master.ejs' }%>
+    <%{ content %>
+        <div class="row align-items-top h-100 justify-content-center overflow-auto">
+            <div class="col-9">
+                <h2 class="text-center py-3">
+                    <%= user.name %>'s publications
+                </h2>
+                <!-- <div class="row justify-content-center">
+                    <button class="col-2 btn btn-dark btn-sm">
+                        Write new publication
+                    </button>
+                </div> -->
+                <ul class="list-group h-100">
+                    <% if (!publications[0]) { %>
+                        <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
+                            <div class="container">
+                                <div class="row justify-content-between mb-2 align-items-center border-bottom border-dark">
+                                    <div class="col">
+                                        <div class="row align-items-center">
+                                            <div class="col-1 p-0">
+                                                <img src="http://localhost:3000/icon.png" width="100%" height="100%">
+                                            </div>
+                                            <div class="col">
+                                                <div class="row justify-content-between">
+                                                    <a class="text-dark h6" href="#">
+                                                        There are not publications yet.
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class=" row overflow-auto text-justify">
+                                    <p>
+                                        Create a publication to get helped!
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    <% } %>
+                    <% publications.forEach(function(publication){ %>
+                        <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
+                            <div class="container">
+                                <div class="row justify-content-between mb-2 align-items-center border-bottom border-dark">
+                                    <div class="col">
+                                        <div class="row align-items-center">
+                                            <div class="col-1 p-0">
+                                                <img src="http://localhost:3000/icon.png" width="100%" height="100%">
+                                            </div>
+                                            <div class="col">
+                                                <div class="row justify-content-between">
+                                                    <a class="text-dark h6" href="/publications/<%= publication.user_id %>">
+                                                        <%= publication.name +" "+ publication.lastname %>
+                                                    </a>
+                                                    <small>
+                                                        <%= publication.created_at %>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class=" row overflow-auto text-justify">
+                                    <p>
+                                        <%= publication.title %>
+                                    </p>
+                                </div>
+                                <div class="row justify-content-end">
+                                        <a class="col-2 btn btn-sm btn-dark" href="/publication/<%= publication.id %>" role="button">
+                                            View publication
+                                        </a>
+                                </div>
+                            </div>
+                        </li>
+                        <% }); %>
+                </ul>
+            </div>
+        </div>
+        <%} %>

@@ -2,44 +2,30 @@
 
 var jwt = require('jwt-simple');
 var moment = require('moment');
-var User = require('../models/user-model');
-const UserController = require('../controllers/user-controller');
+var UserModel = require('../models/user-model');
+var Controller = require('../controllers/controller');
+var controller = new Controller();
+var user = new UserModel();
 var key = process.env.APP_SECRET_JWT_KEY;
 
-exports.authenticate = function (req, res, next) {
+exports.authenticate = async function (req, res, next = () => { }) {
+    console.log("Headers.");
+    console.log(req.headers);
     if (!req.headers.authorization) {
-        return res.status(401).send({
-            message: "Unauthorized.",
-            body: req.body
-        });
+        return controller.sendResponse(res, 401, "Unauthorized.");
     }
     var token = req.headers.authorization.replace(/['"]+/g, '');
     try {
         var payload = jwt.decode(token, key);
+        console.log(payload);
         if (payload.exp <= moment().unix()) {
-            return res.status(404).send({
-                message: "Token expired.",
-                body: req.body
-            });
+            return controller.sendResponse(res, 401, "Your session has expired.");
         }
-        User.findById(payload.sub, (error, doc) => {
-            if (error)
-                return res.status(500).send({
-                    message: error.message,
-                    body: error
-                });
-            if (!doc)
-                return res.status(401).send({
-                    message: "User not found, unauthorized.",
-                    body: {}
-                });
-            req.user = payload;
-            next();
-        });
+        let userVerifying = await user.getUserByEmail(payload.email);
+        if (userVerifying.access_token == token)
+            return controller.sendResponse(res, 200, "User ok.");
+        return controller.sendResponse(res, 401, "Session expired.");
     } catch (ex) {
-        return res.status(404).send({
-            message: "Invalid token.",
-            body: req.body
-        });
+        return controller.sendResponse(res, 401, "Invalid token.");
     }
 }

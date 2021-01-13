@@ -9,7 +9,7 @@ var user = new UserModel();
 
 class UserController {
 
-    registerForm = (req, res) => {
+    registerView = (res) => {
         this.sendView(res, 'register');
     }
 
@@ -46,7 +46,7 @@ class UserController {
         }
     }
 
-    loginForm = (req, res) => {
+    loginView = (res) => {
         this.sendView(res, 'login');
     }
 
@@ -69,8 +69,10 @@ class UserController {
         let userId = userLogin.id;
         let isCorrectPassword = await user.isCorrectPassword(request.password, userId);
         if (isCorrectPassword) {
-            var access_token = jwt.createToken(user);
-            return this.sendResponse(res, 200, "Login ok.", { userLogin, access_token });
+            var access_token = jwt.createToken(userLogin);
+            userLogin.access_token = access_token;
+            userLogin = await user.updateUserById(userId, userLogin);
+            return this.sendResponse(res, 200, "Login ok.", { user: userLogin, access_token });
         }
         return this.sendResponse(res, 400, "Incorrect password.", { password: ["Incorrect password."] });
     }
@@ -88,7 +90,8 @@ class UserController {
     }
 
     sendView = (res, file) => {
-        views.render(`./views/${file}`, (error, str) => {
+        console.log("Sending view: " + file);
+        views.render(`./views/user/${file}`, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');
             res.end(str);

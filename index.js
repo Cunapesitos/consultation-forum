@@ -7,10 +7,19 @@ var migrations = require('./db/migrations');
 migrations.execute();
 
 const http = require('http');
-var nStatic = require('node-static');
-var fileServer = new nStatic.Server('./public');
+var nodeStatic = require('node-static');
+var authMid = require('./auth/middleware');
+var fileServer = new nodeStatic.Server('./public');
+const Controller = require('./controllers/controller');
 const UserController = require('./controllers/user-controller');
+const PublicationController = require('./controllers/publication-controller');
+const CommentController = require('./controllers/comment-controller');
+const CategoryController = require('./controllers/category-controller');
 const userController = new UserController();
+const controller = new Controller();
+const publicationController = new PublicationController();
+const commentController = new CommentController();
+const categoryController = new CategoryController();
 
 const host = process.env.APP_HOST || 'localhost';
 const port = process.env.APP_PORT || 3000;
@@ -19,7 +28,9 @@ const server = http.createServer((req, res) => {
     handleRequest(req, res);
 });
 
-server.listen(port, host, () => { console.log(`Server running at http://${host}:${port}/`); });
+server.listen(port, host, () => {
+    console.log(`Server running at http://${host}:${port}/`);
+});
 
 async function handleRequest(req, res) {
     switch (req.method) {
@@ -37,47 +48,42 @@ async function handleRequest(req, res) {
 
 async function handleGet(req, res) {
     switch (req.url) {
-        case '/': redirectTo(res, '/login'); break;
-        case '/echo': sendEcho(res); break;
-        case '/login': userController.loginForm(req, res); break;
-        case '/register': userController.registerForm(req, res); break;
+        case '/': controller.redirectTo(res, '/login'); break;
+        case '/echo': controller.sendEcho(res); break;
+        case '/me': authMid.authenticate(req, res); break;
+        case '/register': userController.registerView(res); break;
+        case '/login': userController.loginView(res); break;
+        case '/home': publicationController.publicationsView(res); break;
+        case '/publication': publicationController.registerView(res); break;
+        case '/categories': categoryController.getAll(res); break;
         default: handleRouteWithParams(req, res); break;
     }
 }
 
 async function handlePost(req, res) {
     switch (req.url) {
-        case '/login': userController.login(req, res); break;
         case '/register': userController.register(req, res); break;
+        case '/login': userController.login(req, res); break;
+        case '/comment': commentController.register(req, res); break;
+        case '/publication': publicationController.register(req, res); break;
         default: routeNotFound(req, res); break;
     }
 }
 
 async function handleRouteWithParams(req, res) {
-    if (req.url.match(/\/alfa\/\w+/)) {
+    if (req.url.match(/\/publications\/([0-9]+)+/)) {
         const id = req.url.split('/')[2];
-        res.statusCode = 200;
-        res.setHeader('Content-type', 'text/html');
-        res.end(id);
+        console.log(req.url);
+        return publicationController.getPublicationsFromUserId(res, id);
+    } else if (req.url.match(/\/publication\/([0-9]+)+/)) {
+        const id = req.url.split('/')[2];
+        console.log(req.url);
+        return publicationController.getPublication(res, id);
     } else {
-        fileServer.serve(req, res);
-        // routeNotFound(req, res);
+        fileServer.serve(req, res, (error, response) => {
+            if (error && (error.status === 404)) {
+                controller.sendView(res, 'not-found');
+            }
+        });
     }
-}
-
-function routeNotFound(req, res) {
-    res.statusCode = 404;
-    res.setHeader('Content-type', 'application/json');
-    res.end('Route not found.');
-}
-
-function redirectTo(res, route) {
-    res.writeHead(301, { 'Location': route });
-    res.end();
-}
-
-function sendEcho(res) {
-    res.statusCode = 200;
-    res.setHeader('Content-type', 'text/html');
-    res.end('All ok.');
 }
