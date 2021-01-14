@@ -3,7 +3,6 @@
 require('dotenv').config()
 
 var migrations = require('./db/migrations');
-
 migrations.execute();
 
 const http = require('http');
@@ -21,14 +20,14 @@ const publicationController = new PublicationController();
 const commentController = new CommentController();
 const categoryController = new CategoryController();
 
-const host = process.env.APP_HOST || 'http://localhost';
-const port = process.env.APP_PORT || 3000;
+const host = process.env.APP_HOST || 'localhost';
+const port = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
     handleRequest(req, res);
 });
 
-server.listen(port, host, () => {
+server.listen(port, () => {
     console.log(`Server running at ${host}:${port}/`);
 });
 

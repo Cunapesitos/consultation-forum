@@ -89,9 +89,11 @@ class UserController {
         res.end(response);
     }
 
-    sendView = (res, file) => {
+    sendView = (res, file, data = {}) => {
         console.log("Sending view: " + file);
-        views.render(`./views/user/${file}`, (error, str) => {
+        var myData = { data, host: process.env.APP_HOST };
+        console.log(myData);
+        views.render(`./views/user/${file}`, myData, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');
             res.end(str);

@@ -70,9 +70,9 @@ class CategoryController {
         res.end(response);
     }
 
-    sendView = (res, file, data) => {
+    sendView = (res, file, data = {}) => {
         console.log("Returning view:" + file);
-        views.render(`./views/publication/${file}`, data, (error, str) => {
+        views.render(`./views/publication/${file}`, { data, host: process.env.APP_HOST }, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');
             res.end(str);

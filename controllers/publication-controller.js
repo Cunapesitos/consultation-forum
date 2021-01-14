@@ -25,11 +25,17 @@ class PublicationController {
         var v = Validator.make(request, {
             title: 'required',
             content: 'required',
-            user_id: 'required|numeric',
-            category_id: 'required|numeric'
+            user_id: 'required|numeric'
         });
         if (v.fails())
             return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
+        request.categories.forEach(element => {
+            v = Validator.make(element, {
+                category_id: 'required|numeric'
+            });
+            if (v.fails())
+                return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
+        });
         try {
             var newPublication = await publication.create(request);
             return this.sendResponse(res, 201, "Publication created.", newPublication);
@@ -80,9 +86,10 @@ class PublicationController {
 
     sendView = (res, file, data) => {
         console.log("Returning view:" + file + " with:");
-        console.log(data);
+        var myData = { data, host: process.env.APP_HOST };
+        console.log(myData);
         if (file != 'not-found')
-            views.render(`./views/publication/${file}`, data, (error, str) => {
+            views.render(`./views/publication/${file}`, myData, (error, str) => {
                 res.statusCode = 200;
                 res.setHeader('Content-type', 'text/html');
                 res.end(str);

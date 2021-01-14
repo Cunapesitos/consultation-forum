@@ -1,9 +1,9 @@
 'use strict'
 
 var connection = require('./connection').Connection;
-var moment = require('moment');
 
 exports.execute = function () {
+    
     // users
     connection.query(`
     create table if not exists users(
@@ -22,7 +22,6 @@ exports.execute = function () {
     );
 
     // categories
-    let date = moment().format();
     connection.query(`
         create table if not exists categories(
             id int(5) unsigned AUTO_INCREMENT primary key,
@@ -42,13 +41,26 @@ exports.execute = function () {
             title varchar(50) not null,
             content text not null,
             created_at timestamp not null,
-            user_id int(5) unsigned not null,
-            category_id int(5) unsigned not null,
-            foreign key (category_id) references categories(id) on delete cascade 
+            user_id int(5) unsigned not null
         )`,
         (error, results, fields) => {
             if (error) return console.log(error.message);
             console.log("table publications ok.");
+        }
+    );
+
+    // publications_categories
+    connection.query(`
+        create table if not exists publications_categories(
+            publication_id int(5) unsigned not null,
+            foreign key (publication_id) references publications(id) on delete cascade,
+            category_id int(5) unsigned not null,
+            foreign key (category_id) references categories(id) on delete cascade,
+            primary key (publication_id, category_id)
+        )`,
+        (error, results, fields) => {
+            if (error) return console.log(error.message);
+            console.log("table publications_categories ok.");
         }
     );
 
@@ -68,7 +80,8 @@ exports.execute = function () {
             console.log("table comments ok.");
         }
     );
-    
+
+    // category seeder
     connection.query(`
         INSERT IGNORE INTO \`categories\` (\`id\`, \`name\`, \`created_at\`) 
         VALUES 
@@ -82,4 +95,32 @@ exports.execute = function () {
         }
     );
 
+}
+
+function deleteTable(name) {
+    connection.query(`drop table ${name}`,
+        (error, results, fields) => {
+            if (error) return console.log(error.message);
+            console.log(`drop table ${name} ok.`);
+        }
+    );
+}
+
+function addColumn(tableName, column){
+    connection.query(`ALTER TABLE ${tableName} ADD ${column}`,
+        (error, results, fields) => {
+            if (error) return console.log(error.message);
+            console.log(`add column ${column} on table ${tableName} ok.`);
+        }
+    );
+}
+
+function dropColumn(tableName, columnName){
+    connection.query(`ALTER TABLE ${tableName}
+    DROP COLUMN ${columnName};`,
+        (error, results, fields) => {
+            if (error) return console.log(error.message);
+            console.log(`drop column ${columnName} on table ${tableName} ok.`);
+        }
+    );
 }

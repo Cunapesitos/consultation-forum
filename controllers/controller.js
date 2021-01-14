@@ -30,8 +30,8 @@ class Controller {
         res.end(response);
     }
 
-    sendView = (res, file) => {
-        views.render(`./views/${file}`, (error, str) => {
+    sendView = (res, file, data = {}) => {
+        views.render(`./views/${file}`, { data, host: process.env.APP_HOST }, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');
             res.end(str);
