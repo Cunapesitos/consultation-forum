@@ -1,4 +1,4 @@
-<%{ '../master.ejs' }%>
+<%{ '../master.html' }%>
     <%{ style %>
         <style>
             a:hover {
@@ -62,7 +62,7 @@
                                     email: $('#email').val(),
                                     password: $('#password').val()
                                 }, (status, data) => {
-                                    console.log(data);
+                                    //console.log(data);
                                     switch (status) {
                                         case 400:
                                             handleVerifications(data);
@@ -78,7 +78,7 @@
                             });
 
                             function handleVerifications(data) {
-                                console.log(data);
+                                //console.log(data);
                                 Object.keys(data.body).map(function (key, index) {
                                     let errors = data.body[key];
                                     errors.forEach(element => {
@@ -97,17 +97,17 @@
                                 let user = body.user;
                                 saveInLocalStorage('access_token', access_token);
                                 saveInLocalStorage('user', user);
-                                callGet('/categories', (status, data)=>{
-                                    switch (status) {
-                                        case 200:
-                                            saveInLocalStorage('categories', data.body);
-                                            if (getFromLocalStorage('back')) window.history.back();
-                                            else window.location.href = "/publications/" + user.id;       
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                });
+                                // callGet('/categories', (status, data)=>{
+                                //     switch (status) {
+                                //         case 200:
+                                //             saveInLocalStorage('categories', data.body);
+                                if (getFromLocalStorage('back')) window.history.back();
+                                else window.location.href = "/publications/" + user.id;
+                                //             break;
+                                //         default:
+                                //             break;
+                                //     }
+                                // });
                             }
                         </script>
                         <%} %>

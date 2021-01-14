@@ -12,8 +12,8 @@ class CommentController {
 
     register = async (req, res) => {
         let request = (await this.getRequest(req)).data;
-        console.log("request:");
-        console.log(request);
+        //console.log("request:");
+        //console.log(request);
         if (request == undefined)
             return this.response(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
@@ -54,19 +54,20 @@ class CommentController {
     }
 
     sendResponse = (res, code, message, body = {}) => {
+        console.log("Sending response:" + message);
         res.statusCode = code;
         res.setHeader('Content-type', 'application/json');
         let response = JSON.stringify({
             message: message,
             body: body
         });
-        console.log("response:");
-        console.log(JSON.parse(response));
+        //console.log("response:");
+        //console.log(JSON.parse(response));
         res.end(response);
     }
 
     sendView = (res, file, data) => {
-        console.log("Returning view:" + file);
+        console.log("Sending view:" + file);
         views.render(`./views/publication/${file}`, { data, host: process.env.APP_HOST }, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');

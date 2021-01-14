@@ -8,17 +8,18 @@ class CommentModel {
     create = async (data) => {
         return new Promise(async (resolve, reject) => {
             data.created_at = moment().format();
-            console.log("Inserting user...");
-            console.log(data);
+            //console.log("Inserting user...");
+            //console.log(data);
             var query = connection.query('insert into comments set ?', data,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("Comment error.");
                         reject(error);
                     }
-                    console.log("Comment created.");
-                    console.log("SQL executed:");
-                    console.log(query.sql);
+                    console.log("----------------------------------COMMENT CREATED----------------------------");
+                    //console.log("SQL executed:");
+                    //console.log(query.sql);
+                    console.log(results[0]);
                     data.created_at = moment(data.created_at).locale('en').format('LLLL');
                     resolve(data);
                 });
@@ -34,21 +35,21 @@ class CommentModel {
                     and users.id = comments.user_id`, publicationId,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("Comment error.");
                         reject(error);
                     }
                     console.log("Comments found.");
-                    console.log("SQL executed:");
-                    console.log(query.sql);
-                    console.log('results');
+                    //console.log("SQL executed:");
+                    //console.log(query.sql);
+                    //console.log('results');
                     console.log(results);
                     Object.keys(results).map(function (key, indexA) {
                         Object.keys(results[indexA]).map(function (key, index) {
-                            console.log(key);
+                            //console.log(key);
                             if (key == 'created_at') {
                                 results[indexA][key] = moment(results[indexA][key]).locale('en').format('LLLL');
-                                console.log("THIS IS CHANGED");
-                                console.log(results[indexA][key]);
+                                //console.log("THIS IS CHANGED");
+                                //console.log(results[indexA][key]);
                             }
                         });
                     });
@@ -63,14 +64,14 @@ class CommentModel {
                 'select * from comments where id = ? ', id,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("Comment error.");
                         reject(error);
                     }
-                    console.log("Publications found.");
-                    console.log("SQL executed:");
-                    console.log(query.sql);
-                    console.log('results');
-                    console.log(results);
+                    console.log("Comment found.");
+                    //console.log("SQL executed:");
+                    //console.log(query.sql);
+                    // console.log('results');
+                    console.log(results[0]);
                     results[0].created_at = moment(results[0].created_at).locale('en').format('LLLL');
                     resolve(results[0]);
                 });

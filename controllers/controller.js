@@ -25,12 +25,13 @@ class Controller {
             message: message,
             body: body
         });
-        console.log("response:");
-        console.log(JSON.parse(response));
+        //console.log("response:");
+        //console.log(JSON.parse(response));
         res.end(response);
     }
 
     sendView = (res, file, data = {}) => {
+        console.log("Sending view:" + file);
         views.render(`./views/${file}`, { data, host: process.env.APP_HOST }, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');

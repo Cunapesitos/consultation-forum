@@ -47,7 +47,7 @@
     </div>
     <nav id="navbar" class="py-0 collapse navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand py-0" href="#">
+            <a class="navbar-brand py-0" href="/">
                 <img src="<%= host %>/icon.png" height="80">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -64,17 +64,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/publication">Create publication</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <!-- <li class="nav-item dropdown">
+                        <input name="categories-result" class="form-control border-dark input-search"
+                            data-bs-toggle="dropdown" aria-expanded="false" placeholder="Search categories" />
+                        <ul id="categories-result" class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        </ul>
+                    </li> -->
                     <li class="nav-item">
                         <a onclick="logout()" class="nav-link" href="#">Logout</a>
                     </li>
                 </ul>
-                <form class="d-flex">
-                    <select id="categories-select" class="form-select">
-                    </select>
-                    <div class="ms-2">
-                        <button class="btn btn-outline-light" type="submit">Search</button>
-                    </div>
-                </form>
             </div>
         </div>
     </nav>
@@ -82,23 +83,14 @@
         <%{{ content }}%>
     </div>
 
-    <!-- Optional JavaScript; choose one of the two! -->
-
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-        crossorigin="anonymous"></script>
-
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
-    -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"
         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
     <script>
-        function callPost(route, dataToSend, handleResponse) {
-            showSpinner();
+        let waiting;
+
+        function callPost(route, dataToSend, handleResponse, block=true) {
+            if(block)showSpinner();
             let status;
             let headersToSend = { 'Content-Type': 'application/json' };
             let access_token = getFromLocalStorage('access_token');
@@ -106,8 +98,8 @@
                 'Content-Type': 'application/json',
                 'Authorization': access_token
             };
-            console.log("sending with headers: ");
-            console.log(headersToSend);
+            //console.log("sending with headers: ");
+            //console.log(headersToSend);
             fetch(route, {
                 method: 'POST',
                 headers: headersToSend,
@@ -116,7 +108,7 @@
                 status = response.status;
                 return response.json();
             }).then(data => {
-                hideSpinner();
+                hideSpinner(); waiting = false;
                 if (status == 401) logout();
                 if (status == 404) {
                     alert(data.message);
@@ -130,8 +122,8 @@
             });
         }
 
-        function callGet(route, handleResponse) {
-            showSpinner();
+        function callGet(route, handleResponse, block = true) {
+            if (block) showSpinner();
             let status;
             let headersToSend = { 'Content-Type': 'application/json' };
             let access_token = getFromLocalStorage('access_token');
@@ -139,8 +131,8 @@
                 'Content-Type': 'application/json',
                 'Authorization': access_token
             };
-            console.log("sending with headers: ");
-            console.log(headersToSend);
+            //console.log("sending with headers: ");
+            //console.log(headersToSend);
             fetch(route, {
                 method: 'GET',
                 headers: headersToSend
@@ -149,6 +141,8 @@
                 return response.json();
             }).then(data => {
                 hideSpinner();
+                //console.log(data);
+                waiting = false;
                 if (status == 401) logout();
                 if (status == 404) {
                     alert(data.message);
@@ -158,7 +152,7 @@
             }).catch((error) => {
                 hideSpinner();
                 alert(error.message);
-                console.log(error);
+                //console.log(error);
             });
         }
 
@@ -192,7 +186,7 @@
         }
 
         function handleVerifications(data) {
-            console.log(data);
+            //console.log(data);
             Object.keys(data.body).map(function (key, index) {
                 let errors = data.body[key];
                 errors.forEach(element => {
@@ -213,7 +207,6 @@
                         let user = getFromLocalStorage('user');
                         window.location.href = '/publications/' + user.id;
                     }
-                    setCategories('categories-select');
                 } else {
                     logout();
                 }
@@ -226,15 +219,6 @@
             $('#navbar').removeClass('show');
         }
 
-        function setCategories(id) {
-            let categories = getFromLocalStorage('categories');
-            categories.forEach(element => {
-                $('#' + id).append(`
-                    <option value="${element.id}">${element.name}</option>
-                `);
-            });
-        }
-    
         $("input").keydown(function () {
             let id = $(this).attr('id');
             $(`#${id}-errors`).text("");
@@ -245,12 +229,26 @@
             $(`#${id}-errors`).text("");
         });
 
-        $("select").change(function(){
+        $("select").change(function () {
             let id = $(this).attr('id');
             $(`#${id}-errors`).text("");
         });
 
     </script>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+    -->
+
     <%{{ script }}%>
 </body>
 

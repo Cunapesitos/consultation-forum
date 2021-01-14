@@ -9,15 +9,15 @@ var user = new UserModel();
 var key = process.env.APP_SECRET_JWT_KEY;
 
 exports.authenticate = async function (req, res, next = () => { }) {
-    console.log("Headers.");
-    console.log(req.headers);
+    //console.log("Headers.");
+    //console.log(req.headers);
     if (!req.headers.authorization) {
         return controller.sendResponse(res, 401, "Unauthorized.");
     }
     var token = req.headers.authorization.replace(/['"]+/g, '');
     try {
         var payload = jwt.decode(token, key);
-        console.log(payload);
+        //console.log(payload);
         if (payload.exp <= moment().unix()) {
             return controller.sendResponse(res, 401, "Your session has expired.");
         }

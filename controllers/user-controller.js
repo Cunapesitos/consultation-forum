@@ -15,8 +15,8 @@ class UserController {
 
     register = async (req, res) => {
         let request = (await this.getRequest(req)).data;
-        console.log("request:");
-        console.log(request);
+        //console.log("request:");
+        //console.log(request);
         if (request == undefined)
             return this.response(res, 400, "Validation failed.", { data: {} });
         var name = request.name;
@@ -52,8 +52,8 @@ class UserController {
 
     login = async (req, res) => {
         let request = (await this.getRequest(req)).data;
-        console.log("request:");
-        console.log(request);
+        //console.log("request:");
+        //console.log(request);
         if (request == undefined)
             return this.sendResponse(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
@@ -78,21 +78,22 @@ class UserController {
     }
 
     sendResponse = (res, code, message, body = {}) => {
+        console.log("Sending response: " + message);
         res.statusCode = code;
         res.setHeader('Content-type', 'application/json');
         let response = JSON.stringify({
             message: message,
             body: body
         });
-        console.log("response:");
-        console.log(JSON.parse(response));
+        //console.log("response:");
+        //console.log(JSON.parse(response));
         res.end(response);
     }
 
     sendView = (res, file, data = {}) => {
         console.log("Sending view: " + file);
         var myData = { data, host: process.env.APP_HOST };
-        console.log(myData);
+        //console.log(myData);
         views.render(`./views/user/${file}`, myData, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');

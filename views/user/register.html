@@ -1,4 +1,4 @@
-<%{ '../master.ejs' }%>
+<%{ '../master.html' }%>
     <%{ content %>
         <div class="row align-items-center h-100">
             <div class="col-6 mx-auto">
@@ -82,7 +82,7 @@
                             password: $('#password').val(),
                             password_confirmation: $('#password_confirmation').val()
                         }, (status, data) => {
-                            console.log(data);
+                            //console.log(data);
                             switch (status) {
                                 case 400:
                                     handleVerifications(data);
@@ -99,5 +99,6 @@
                         }
                         );
                     });
+
                 </script>
                 <%} %>

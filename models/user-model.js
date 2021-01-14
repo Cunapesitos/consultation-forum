@@ -13,16 +13,16 @@ class UserModel {
             data.password = hash;
             data.created_at = moment().format();
             delete data.password_confirmation;
-            console.log("Inserting user...");
-            console.log(data);
+            //console.log("Inserting user...");
+            //console.log(data);
             var query = connection.query('insert into users set ?', data,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("User error.");
                         reject(error);
                     }
-                    console.log("User created.");
-                    console.log("SQL executed:");
+                    console.log("----------------------------------USER CREATED----------------------------");
+                    //console.log("SQL executed:");
                     console.log(query.sql);
                     resolve(data);
                 });
@@ -34,14 +34,16 @@ class UserModel {
             var query = connection.query('select * from users where email = ?', email,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("User error.");
                         reject(error);
                     }
                     console.log("User found.");
-                    console.log("SQL executed:");
-                    console.log(query.sql);
-                    console.log('results');
+                    //console.log("SQL executed:");
+                    //console.log(query.sql);
+                    // console.log('results');
                     console.log(results[0]);
+                    if ((!results))
+                        resolve(null);
                     if (results[0])
                         delete results[0].password;
                     resolve(results[0]);
@@ -54,13 +56,13 @@ class UserModel {
             var query = connection.query('select * from users where id = ?', id,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("User error.");
                         reject(error);
                     }
                     console.log("User found.");
-                    console.log("SQL executed:");
-                    console.log(query.sql);
-                    console.log('results');
+                    //console.log("SQL executed:");
+                    //console.log(query.sql);
+                    //console.log('results');
                     console.log(results[0]);
                     if (results[0])
                         delete results[0].password;
@@ -74,19 +76,19 @@ class UserModel {
             var query = connection.query('select * from users where id = ?', userId,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Here is the error.");
+                        console.log("User error.");
                         reject(error);
                     }
                     console.log("User found.");
-                    console.log("SQL executed:");
-                    console.log(query.sql);
-                    console.log('results');
+                    //console.log("SQL executed:");
+                    //console.log(query.sql);
+                    //console.log('results');
                     console.log(results[0]);
                     let user = results[0];
-                    console.log(user.password);
+                    //console.log(user.password);
                     bcrypt.compare(password, user.password, (error, same) => {
                         if (error) {
-                            console.log("Error decrypting.");
+                            console.log("Decrypt error.");
                             reject(error);
                         }
                         resolve(same);
@@ -112,19 +114,19 @@ class UserModel {
                 newUserData.id
             ], function (error, results, fields) {
                 if (error) {
-                    console.log("Here is the error.");
+                    console.log("User error.");
                     reject(error);
                 }
                 var query = connection.query('select * from users where id = ?', newUserData.id,
                     (error, results, fields) => {
                         if (error) {
-                            console.log("Here is the error.");
+                            console.log("User error.");
                             reject(error);
                         }
                         console.log("User found.");
-                        console.log("SQL executed:");
-                        console.log(query.sql);
-                        console.log('results');
+                        //console.log("SQL executed:");
+                        //console.log(query.sql);
+                        //console.log('results');
                         console.log(results[0]);
                         if (results[0])
                             delete results[0].password;

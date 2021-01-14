@@ -4,6 +4,14 @@ var connection = require('./connection').Connection;
 
 exports.execute = function () {
     
+    //addColumn('categories', 'style varchar(15) NOT NULL after name');
+
+    deleteTable('comments');
+    deleteTable('publications_categories');
+    deleteTable('publications');
+    deleteTable('categories');
+    deleteTable('users');
+
     // users
     connection.query(`
     create table if not exists users(
@@ -25,7 +33,8 @@ exports.execute = function () {
     connection.query(`
         create table if not exists categories(
             id int(5) unsigned AUTO_INCREMENT primary key,
-            name varchar(30) not null,
+            name varchar(30) not null unique,
+            style varchar(15) not null,
             created_at timestamp
         )`,
         (error, results, fields) => {
@@ -83,11 +92,15 @@ exports.execute = function () {
 
     // category seeder
     connection.query(`
-        INSERT IGNORE INTO \`categories\` (\`id\`, \`name\`, \`created_at\`) 
+        INSERT IGNORE INTO \`categories\` (\`id\`, \`name\`, \`style\`, \`created_at\`) 
         VALUES 
-        ('1', 'Base de datos', current_timestamp()),
-        ('2', 'Java', current_timestamp()),
-        ('3', 'Calculo 1', current_timestamp());
+        ('1', 'Base de datos', 'success', current_timestamp()),
+        ('2', 'Java', 'warning', current_timestamp()),
+        ('3', 'Calculo 1', 'info', current_timestamp()),
+        ('4', 'Calculo 2', 'dark', current_timestamp()),
+        ('5', 'Programacion 1', 'white', current_timestamp()),
+        ('6', 'Programacion 2', 'secondary', current_timestamp()),
+        ('7', 'Algebra lineal', 'danger', current_timestamp());
     `,
         (error, results, fields) => {
             if (error) return console.log(error.message);

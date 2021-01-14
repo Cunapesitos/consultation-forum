@@ -14,6 +14,7 @@ const UserController = require('./controllers/user-controller');
 const PublicationController = require('./controllers/publication-controller');
 const CommentController = require('./controllers/comment-controller');
 const CategoryController = require('./controllers/category-controller');
+const { table } = require('console');
 const userController = new UserController();
 const controller = new Controller();
 const publicationController = new PublicationController();
@@ -28,7 +29,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-    console.log(`Server running at ${host}:${port}/`);
+    console.log(`Server running at ${host}/`);
 });
 
 async function handleRequest(req, res) {
@@ -72,12 +73,25 @@ async function handlePost(req, res) {
 async function handleRouteWithParams(req, res) {
     if (req.url.match(/\/publications\/([0-9]+)+/)) {
         const id = req.url.split('/')[2];
-        console.log(req.url);
+        //console.log(req.url);
         return publicationController.getPublicationsFromUserId(res, id);
     } else if (req.url.match(/\/publication\/([0-9]+)+/)) {
         const id = req.url.split('/')[2];
-        console.log(req.url);
+        //console.log(req.url);
         return publicationController.getPublication(res, id);
+    } else if (req.url.match(/\/search\/\w+\/\w+/)) {
+        const tableName = req.url.split('/')[2];
+        const word = req.url.split('/')[3];
+        //console.log(req.url);
+        //console.log("data");
+        //console.log(tableName + "-" + word);
+        switch (tableName) {
+            case 'categories':
+                return categoryController.search(res, word);
+            default:
+                controller.sendView(res, 'not-found');
+                break;
+        }
     } else {
         fileServer.serve(req, res, (error, response) => {
             if (error && (error.status === 404)) {

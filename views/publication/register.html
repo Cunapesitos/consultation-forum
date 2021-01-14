@@ -1,0 +1,212 @@
+<%{ '../master.html' }%>
+    <%{ style %>
+        <style>
+            .myShow {
+                margin: 0px;
+                position: absolute;
+                inset: 0px auto auto 0px;
+                transform: translate(892.8px, 208px);
+            }
+        </style>
+        <%} %>
+            <%{ content %>
+                <div class="row align-items-top h-100 mt-4 overflow-auto">
+                    <div class="col-6 mx-auto">
+                        <div class="border rounded-3 border-dark pb-3 px-3 overflow-auto">
+                            <div class="row my-2 border-bottom border-dark align-items-end">
+                                <div class="col">
+                                    <div class="d-flex justify-content-center">
+                                        <img src="<%= host %>/icon.png" height="70">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h3 class="text-center">
+                                        New publication
+                                    </h3>
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex justify-content-center">
+                                        <img src="<%= host %>/icon.png" height="70">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="mb-3 col-8">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" id="title" class="form-control border-dark">
+                                    <small id="title-errors" class="text-danger"></small>
+                                </div>
+                                <div class="mb-3 col">
+                                    <label class="form-label">Category</label>
+                                    <input id="input-search" name="categories-result"
+                                        class="form-control border-dark input-search" placeholder="Search categories" />
+                                    <ul id="categories-result" class="dropdown-menu ms-2 p-0">
+                                        <li><button class="dropdown-item ">No results</button></li>
+                                    </ul>
+                                    <small id="category_id-errors" class="text-danger"></small>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="mb-3 col">
+                                    <label class="form-label">Categories</label>
+                                    <div>
+                                        <div class="row">
+                                            <div class="col" id="categories-selected">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="mb-3 col">
+                                    <label class="form-label">Content</label>
+                                    <textarea id="content" rows="4" class="form-control border-dark"></textarea>
+                                    <small id="content-errors" class="text-danger"></small>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" id="btn-cancel" class="btn btn-outline-dark">
+                                            Cancel
+                                        </button>
+                                        <button type="button" id="btn-submit" class="btn btn-dark col-3">
+                                            Create
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%} %>
+                    <%{ script %>
+                        <script>
+                            $(document).click(function (e) {
+                                if (!$('#categories-result').is(e.target) && $('#categories-result').has(e.target).length === 0) {// if div is not target nor its descendant
+                                    $('#categories-result').removeClass('myShow');
+                                }
+                            });
+
+                            saveInLocalStorage('categories-selected', []);
+
+                            addCategory(0, '');
+                            
+                            $('#input-search').on('input', function () {
+                                // if (!waiting) {
+                                $('#categories-result').addClass('show');
+                                let word = $(this).val();
+                                let whereToShow = $(this).attr('name');
+                                waiting = true;
+                                if (!word) clearInput();
+                                else setCategories(whereToShow, word);
+                                // }
+                            });
+
+                            $('#input-search').on('input', function () {
+                                $('#categories-result').removeClass('myShow');
+                            });
+
+                            $('#btn-submit').on('click', () => {
+                                let title = $('#title').val();
+                                let content = $('#content').val();
+                                let categoryId = $('#category_id').val();
+                                let userId = getFromLocalStorage('user').id;
+                                let categoriesSelected = getFromLocalStorage('categories-selected');
+                                callPost('/publication', {
+                                    title: title,
+                                    content: content,
+                                    user_id: userId,
+                                    categories: categoriesSelected
+                                }, (status, data) => {
+                                    switch (status) {
+                                        case 201:
+                                            alert(data.message);
+                                            window.location.href = '/publication/' + data.body.id;
+                                            break;
+                                        case 400:
+                                            handleVerifications(data);
+                                            break;
+                                        default:
+                                            alert(data.message);
+                                            break;
+                                    }
+                                });
+                            });
+
+                            function setCategories(id, word) {
+                                let categoriesSelected = getFromLocalStorage('categories-selected');
+                                callGet('/search/categories/' + word, (status, data) => {
+                                    if (status == 200) {
+                                        let categories = data.body.categories;
+                                        //console.log(categories);
+                                        $('#' + id).text('');
+                                        if (categories.length == 0) {
+                                            //console.log("1 time");
+                                            $('#' + id).append(`
+                                        <li><button class="dropdown-item">No results</button></li>
+                                    `);
+                                        }
+                                        categories.forEach(element => {
+                                            let selected = false;
+                                            categoriesSelected.forEach(selectedElement => {
+                                                if (!selected) selected = element.id == selectedElement.id;
+                                            });
+                                            if (!selected)
+                                                $('#' + id).append(`
+                                            <li class="justify-content-center">
+                                                <button onclick="addCategory(${element.id},'${element.name}')" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
+                                                    ${element.name}
+                                                </button>
+                                            </li>
+                                        `);
+                                            // $('#' + id).append(`
+                                            // <option value="${element.id}">${element.name}</option>
+                                            // `);
+                                        });
+                                        $('#' + id).addClass('myShow show');
+                                        // $('#' + id).append(`
+                                        //     <li><hr class="dropdown-divider"></li>
+                                        //     <li><a class="dropdown-item" href="/category">Añadir categoria</a></li> 
+                                        // `);
+                                    }
+                                }, false);
+                            }
+
+                            function addCategory(id, name) {
+                                clearInput();
+                                let categoriesSelected = getFromLocalStorage('categories-selected');
+                                if (id == 0) {
+                                    $('#categories-selected').append(`
+                                <div class="col">No categories selected</div>
+                            `);
+                                    categoriesSelected = [];
+                                }
+                                else {
+                                    $('#categories-selected').text('');
+                                    categoriesSelected.push({ id: id, name: name });
+                                }
+                                saveInLocalStorage('categories-selected', categoriesSelected);
+                                refreshCategoryList();
+                            }
+
+                            function clearInput() {
+                                $('.input-search').val("");
+                                $('#categories-result').text("");
+                                $('#categories-result').append(`
+                            <li><button class="dropdown-item">No results</button></li>
+                        `);
+                            }
+
+                            function refreshCategoryList() {
+                                let categoriesSelected = getFromLocalStorage('categories-selected');
+                                categoriesSelected.forEach(element => {
+                                    $('#categories-selected').append(`
+                                <span class="badge bg-light text-dark border border-dark" id="${element.id}">${element.name}</span>
+                            `);
+                                });
+                            }
+
+                        </script>
+                        <%} %>
