@@ -20,7 +20,7 @@ const publicationController = new PublicationController();
 const commentController = new CommentController();
 const categoryController = new CategoryController();
 
-const host = process.env.APP_HOST || 'localhost';
+const host = process.env.APP_HOST || 'http://localhost';
 const port = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
