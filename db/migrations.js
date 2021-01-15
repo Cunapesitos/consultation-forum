@@ -13,7 +13,7 @@ exports.execute = async function () {
     deleteTable('publications_categories');
     deleteTable('publications');
     deleteTable('categories');
-    deleteTable('groups');
+    deleteTable('grops');
     deleteTable('users');
 
     // users
@@ -49,7 +49,7 @@ exports.execute = async function () {
 
     // groups
     connection.query(`
-        create table if not exists groups(
+        create table if not exists grops(
             id int(5) unsigned AUTO_INCREMENT primary key,
             name varchar(30) not null,
             created_at timestamp not null,
@@ -73,7 +73,7 @@ exports.execute = async function () {
             category_id int(5) unsigned not null,
             group_id int(5) unsigned,
             foreign key (category_id) references categories(id) on delete cascade,
-            foreign key (group_id) references groups(id) on delete cascade
+            foreign key (group_id) references grops(id) on delete cascade
         )`,
         (error, results, fields) => {
             if (error) return console.log(error.message);
@@ -103,7 +103,7 @@ exports.execute = async function () {
     connection.query(`
         create table if not exists groups_categories(
             group_id int(5) unsigned not null,
-            foreign key (group_id) references groups(id) on delete cascade,
+            foreign key (group_id) references grops(id) on delete cascade,
             category_id int(5) unsigned not null,
             foreign key (category_id) references categories(id) on delete cascade,
             primary key (group_id, category_id)

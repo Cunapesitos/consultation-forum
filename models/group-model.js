@@ -7,7 +7,7 @@ class GroupModel {
 
     search = async (word) => {
         return new Promise(async (resolve, reject) => {
-            var query = connection.query(`select * from groups where name LIKE '%${word}%' limit 10;`,
+            var query = connection.query(`select * from grops where name LIKE '%${word}%' limit 10;`,
                 (error, results, fields) => {
                     if (error) {
                         console.log("Group error.");
@@ -23,7 +23,7 @@ class GroupModel {
     create = async (data) => {
         return new Promise(async (resolve, reject) => {
             data.created_at = moment().format();
-            connection.query('insert into groups set ?', data,
+            connection.query('insert into grops set ?', data,
                 (error, results, fields) => {
                     if (error) {
                         console.log("Group error.");
@@ -73,7 +73,7 @@ class GroupModel {
     getFromId = async (id) => {
         return new Promise(async (resolve, reject) => {
             var query = connection.query(
-                'select * from groups where id = ? ', id,
+                'select * from grops where id = ? ', id,
                 (error, results, fields) => {
                     if (error) {
                         console.log("Group error.");
