@@ -148,7 +148,7 @@ exports.execute = async function () {
 }
 
 function deleteTable(name) {
-    connection.query(`drop table ${name}`,
+    connection.query(`drop table if exists ${name}`,
         (error, results, fields) => {
             if (error) return console.log(error.message);
             console.log(`drop table ${name} ok.`);
