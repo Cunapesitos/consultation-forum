@@ -13,6 +13,7 @@ exports.execute = async function () {
     deleteTable('publications_categories');
     deleteTable('publications');
     deleteTable('categories');
+    deleteTable('groups');
     deleteTable('grops');
     deleteTable('users');
 

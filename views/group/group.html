@@ -47,7 +47,7 @@
                 <div class="container h-100">
                     <div class="row align-items-top justify-content-center  overflow-auto">
                         <div class="col-11 mx-auto">
-                            <ul class="list-group">
+                            <ul id="ul-publications" class="list-group">
                                 <div id="btn-collapse-form" class="collapse show">
                                     <div class="row justify-content-center">
                                         <button onclick="openForm()" class="col-3 btn btn-sm btn-outline-dark">
@@ -197,8 +197,47 @@
                         });
                     });
 
-                    function addNewGroup(group) {
-
+                    function addNewPublication(publication) {
+                        $('#ul-publications').append(`
+                        <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
+                                        <div class="container">
+                                            <div
+                                                class="row justify-content-between mb-2 align-items-center border-bottom border-gray">
+                                                <div class="col">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-1 p-0 me-2">
+                                                            <img src="<%= host %>/icon.png" width="100alfalfa"
+                                                                height="100alfalfa">
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="row justify-content-between">
+                                                                <a class="text-dark h6"
+                                                                    href="/publications/${publication.user_id}">
+                                                                    ${publication.name +" "+ publication.lastname}
+                                                                </a>
+                                                                <small>
+                                                                    ${publication.created_at}
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class=" row overflow-auto text-justify">
+                                                                        <p>
+                                                                            ${publication.title}
+                                                                        </p>
+                                                            </div>
+                                                            <div class="row justify-content-end">
+                                                                <a class="col-3 btn btn-sm btn-dark"
+                                                                    href="/publication/${publication.id}"
+                                                                    role="button">
+                                                                    View publication
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                    </li>
+                        `);
                     }
 
                     function openForm() {
