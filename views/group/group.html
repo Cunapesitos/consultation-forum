@@ -1,0 +1,215 @@
+<%{ '../master.html' }%>
+    <%{ content %>
+        <div class="row align-items-top h-100 justify-content-center overflow-auto">
+            <div class="col-9">
+                <h2 class="text-center py-3">
+                    <%= data.group.name %>
+                </h2>
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
+                        <div class="container">
+                            <div class="row justify-content-between mb-2 align-items-center border-bottom border-gray">
+                                <div class="col">
+                                    <div class="row align-items-center">
+                                        <div class="col-1 p-0">
+                                            <img src="<%= host %>/icon.png" width="100%" height="100%">
+                                        </div>
+                                        <div class="col">
+                                            <div class="row justify-content-between">
+                                                <a class="text-dark h6" href="/publications/1">
+                                                    <%= data.user.name %>
+                                                </a>
+                                                <small>
+                                                    Owner
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" row overflow-auto text-justify">
+                                <p>
+                                    <%= data.user.email %>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <% data.categories.forEach(function(category){ %>
+                                    <label class="badge bg-light text-dark border border-dark">
+                                        <%= category.name %>
+                                    </label>
+                                    <% }); %>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="container h-100">
+                    <div class="row align-items-top justify-content-center  overflow-auto">
+                        <div class="col-11 mx-auto">
+                            <ul class="list-group">
+                                <div id="btn-collapse-form" class="collapse show">
+                                    <div class="row justify-content-center">
+                                        <button onclick="openForm()" class="col-3 btn btn-sm btn-outline-dark">
+                                            Create publication
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="collapsed-form" class="collapse">
+                                    <li class="list-group-item my-2 border rounded-3 border-dark">
+                                        <div class="row align-items-center">
+                                            <div class=" pb-3 px-3 overflow-auto">
+                                                <div class="row justify-content-center">
+                                                    <h5 class="text-center">
+                                                        Create a publication
+                                                    </h5>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="mb-3 col-1">
+                                                        <label class="form-label text-right">Title</label>
+                                                    </div>
+                                                    <div class="mb-3 col">
+                                                        <input type="text" id="title" class="form-control border-dark">
+                                                        <small id="title-errors" class="text-danger"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="mb-3 col">
+                                                        <label class="form-label">Choose one category:</label>
+                                                        <% data.categories.forEach(function(category){ %>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input category-option"
+                                                                    type="radio" name="inlineRadioOptions"
+                                                                    id="inlineRadio<%= category.id %>"
+                                                                    value="<%= category.id %>">
+                                                                <label
+                                                                    class="badge bg-light text-dark border border-dark"
+                                                                    for="inlineRadio<%= category.id %>">
+                                                                    <%= category.name %>
+                                                                </label>
+                                                            </div>
+                                                            <% }); %>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-1">
+                                                        <label class="form-label text-right">Content</label>
+                                                    </div>
+                                                    <div class="mb-3 col">
+                                                        <textarea id="content" rows="4"
+                                                            class="form-control border-dark"></textarea>
+                                                        <small id="content-errors" class="text-danger"></small>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="d-flex justify-content-between">
+                                                            <button onclick="closeForm()" type="button"
+                                                                class="btn btn-outline-dark col-3">
+                                                                Cancel
+                                                            </button>
+                                                            <button type="button" id="btn-submit"
+                                                                class="btn btn-dark col-3">
+                                                                Create
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </div>
+                                <% data.publications.forEach(function(publication){ %>
+                                    <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
+                                        <div class="container">
+                                            <div
+                                                class="row justify-content-between mb-2 align-items-center border-bottom border-gray">
+                                                <div class="col">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-1 p-0 me-2">
+                                                            <img src="<%= host %>/icon.png" width="100alfalfa"
+                                                                height="100alfalfa">
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="row justify-content-between">
+                                                                <a class="text-dark h6"
+                                                                    href="/publications/<%= publication.user_id %>">
+                                                                    <%= publication.name +" "+ publication.lastname %>
+                                                                </a>
+                                                                <small>
+                                                                    <%= publication.created_at %>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class=" row overflow-auto text-justify">
+                                                                        <p>
+                                                                            <%= publication.title %>
+                                                                        </p>
+                                                            </div>
+                                                            <div class="row justify-content-end">
+                                                                <a class="col-3 btn btn-sm btn-dark"
+                                                                    href="/publication/<%= publication.id %>"
+                                                                    role="button">
+                                                                    View publication
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                    </li>
+                                    <% }); %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%} %>
+            <%{ script %>
+                <script>
+
+                    $('#btn-submit').on('click', () => {
+                        let title = $('#title').val();
+                        let content = $('#content').val();
+                        let categoryId = $('.category-option:checked').val();
+                        let userId = getFromLocalStorage('user').id;
+                        let groupId = <%= data.group.id %>;
+                        callPost('/publication', {
+                            title: title,
+                            content: content,
+                            user_id: userId,
+                            category_id: categoryId,
+                            group_id: groupId
+                        }, (status, data) => {
+                            switch (status) {
+                                case 201:
+                                    alert(data.message);
+                                    addNewPublication(data.body);
+                                    break;
+                                case 400:
+                                    handleVerifications(data);
+                                    break;
+                                default:
+                                    alert(data.message);
+                                    break;
+                            }
+                        });
+                    });
+
+                    function addNewGroup(group) {
+
+                    }
+
+                    function openForm() {
+                        $('#collapsed-form').addClass('show');
+                        $('#btn-collapse-form').removeClass('show');
+                    }
+
+                    function closeForm() {
+                        $('#collapsed-form').removeClass('show');
+                        $('#btn-collapse-form').addClass('show');
+                    }
+
+                </script>
+                <%} %>

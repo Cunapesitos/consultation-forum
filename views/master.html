@@ -64,14 +64,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/publication">Create publication</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/group">Groups</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <!-- <li class="nav-item dropdown">
-                        <input name="categories-result" class="form-control border-dark input-search"
-                            data-bs-toggle="dropdown" aria-expanded="false" placeholder="Search categories" />
-                        <ul id="categories-result" class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        </ul>
-                    </li> -->
                     <li class="nav-item">
                         <a onclick="logout()" class="nav-link" href="#">Logout</a>
                     </li>
@@ -80,6 +77,11 @@
         </div>
     </nav>
     <div class="fade show container-fluid h-100 position-fixed">
+        <div id="master-back" class="row position-fixed collapse show m-2">
+            <button onclick="window.history.back();" class="btn btn-dark">
+                Go back
+            </button>
+        </div>
         <%{{ content }}%>
     </div>
 
@@ -89,8 +91,8 @@
     <script>
         let waiting;
 
-        function callPost(route, dataToSend, handleResponse, block=true) {
-            if(block)showSpinner();
+        function callPost(route, dataToSend, handleResponse, block = true) {
+            if (block) showSpinner();
             let status;
             let headersToSend = { 'Content-Type': 'application/json' };
             let access_token = getFromLocalStorage('access_token');
@@ -203,9 +205,14 @@
             $('#my-publications-a').attr('href', `/publications/${getFromLocalStorage('user').id}`);
             callGet('/me', (status, data) => {
                 if (status == 200) {
+                    let user = getFromLocalStorage('user');
                     if (['/login', '/register'].indexOf(window.location.pathname) >= 0) {
-                        let user = getFromLocalStorage('user');
                         window.location.href = '/publications/' + user.id;
+                    }
+                    if (['/publications/' + user.id].indexOf(window.location.pathname) >= 0) {
+                        $('#master-back').removeClass('show');
+                    } else {
+                        $('#master-back').addClass('show');
                     }
                 } else {
                     logout();
@@ -217,7 +224,12 @@
                 window.location.href = '/login';
             }
             $('#navbar').removeClass('show');
+            $('#master-back').removeClass('show');
         }
+
+        $('#btn-cancel').on('click', () => {
+            window.history.back();
+        });
 
         $("input").keydown(function () {
             let id = $(this).attr('id');

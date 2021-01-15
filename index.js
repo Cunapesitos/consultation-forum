@@ -14,12 +14,13 @@ const UserController = require('./controllers/user-controller');
 const PublicationController = require('./controllers/publication-controller');
 const CommentController = require('./controllers/comment-controller');
 const CategoryController = require('./controllers/category-controller');
-const { table } = require('console');
+const GroupController = require('./controllers/group-controller');
 const userController = new UserController();
 const controller = new Controller();
 const publicationController = new PublicationController();
 const commentController = new CommentController();
 const categoryController = new CategoryController();
+const groupController = new GroupController();
 
 const host = process.env.APP_HOST || 'http://localhost';
 const port = process.env.PORT || 3000;
@@ -56,6 +57,7 @@ async function handleGet(req, res) {
         case '/home': publicationController.publicationsView(res); break;
         case '/publication': publicationController.registerView(res); break;
         case '/categories': categoryController.getAll(res); break;
+        case '/group': groupController.registerView(res); break;
         default: handleRouteWithParams(req, res); break;
     }
 }
@@ -66,6 +68,7 @@ async function handlePost(req, res) {
         case '/login': userController.login(req, res); break;
         case '/comment': commentController.register(req, res); break;
         case '/publication': publicationController.register(req, res); break;
+        case '/group': groupController.register(req, res); break;
         default: routeNotFound(req, res); break;
     }
 }
@@ -73,18 +76,24 @@ async function handlePost(req, res) {
 async function handleRouteWithParams(req, res) {
     if (req.url.match(/\/publications\/([0-9]+)+/)) {
         const id = req.url.split('/')[2];
-        //console.log(req.url);
         return publicationController.getPublicationsFromUserId(res, id);
     } else if (req.url.match(/\/publication\/([0-9]+)+/)) {
         const id = req.url.split('/')[2];
-        //console.log(req.url);
         return publicationController.getPublication(res, id);
+    } else if (req.url.match(/\/group\/([0-9]+)+/)) {
+        const id = req.url.split('/')[2];
+        return groupController.getGroup(res, id);
     } else if (req.url.match(/\/search\/\w+\/\w+/)) {
         const tableName = req.url.split('/')[2];
         const word = req.url.split('/')[3];
-        //console.log(req.url);
-        //console.log("data");
-        //console.log(tableName + "-" + word);
+        switch (tableName) {
+            case 'categories': return categoryController.search(res, word);
+            case 'groups': return groupController.search(res, word);
+            default: controller.sendView(res, 'not-found'); break;
+        }
+    } else if (req.url.match(/\/search\/\w+\/\w+/)) {
+        const tableName = req.url.split('/')[2];
+        const word = req.url.split('/')[3];
         switch (tableName) {
             case 'categories':
                 return categoryController.search(res, word);

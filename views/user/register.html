@@ -70,10 +70,6 @@
         <%} %>
             <%{ script %>
                 <script>
-                    $('#btn-cancel').on('click', () => {
-                        window.history.back();
-                    });
-
                     $('#btn-submit').on('click', () => {
                         callPost('/register', {
                             name: $('#name').val(),

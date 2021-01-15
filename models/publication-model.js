@@ -59,20 +59,34 @@ class PublicationModel {
     getFromId = async (id) => {
         return new Promise(async (resolve, reject) => {
             var query = connection.query(
-                'select * from publications where id = ? ', id,
+                'select publications.*, categories.name from publications, categories where publications.id = ? and category_id = categories.id', id,
                 (error, results, fields) => {
                     if (error) {
                         console.log("Publication error.");
                         reject(error);
                     }
                     console.log("Publications found.");
-                    //console.log("SQL executed:");
-                    //console.log(query.sql);
-                    //console.log('results');
                     console.log(results[0]);
                     if (results[0])
                         results[0].created_at = moment(results[0].created_at).locale('en').format('LLLL');
                     resolve(results[0]);
+                });
+        });
+    }
+
+    getFromGroupId = async (groupId) => {
+        return new Promise(async (resolve, reject) => {
+            var query = connection.query(`
+                select * from publications, users
+                where group_id = ? and publications.user_id=users.id`, groupId,
+                (error, results, fields) => {
+                    if (error) {
+                        console.log("Group error.");
+                        reject(error);
+                    }
+                    console.log("Groups found.");
+                    console.log(results);
+                    resolve(results);
                 });
         });
     }

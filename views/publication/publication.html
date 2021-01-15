@@ -36,11 +36,9 @@
                                         </div>
                                         <div class="row">
                                             <div class="col">
-                                                <% data.categories.forEach(function(category){ %>
-                                                    <button class="badge bg-light text-dark border border-dark">
-                                                        <%= category.name %>
-                                                    </button>
-                                                    <% }); %>
+                                                <button class="badge bg-light text-dark border border-dark">
+                                                    <%= data.publication.name %>
+                                                </button>
                                             </div>
                                         </div>
                     </li>
@@ -107,13 +105,11 @@
                         $('#comment-content').val("");
                         let publication_id = $('#publication-id').val();
                         let user_id = getFromLocalStorage('user').id;
-                        //console.log(content);
                         callPost('/comment', {
                             content: content,
                             publication_id: publication_id,
                             user_id: user_id,
                         }, (status, data) => {
-                            //console.log(data);
                             switch (status) {
                                 case 201:
                                     addToComments(data);
@@ -126,40 +122,41 @@
                     });
 
                     function addToComments(data) {
+                        console.log(data);
                         let user = getFromLocalStorage('user');
                         let completeName = user.name + " " + user.lastname;
                         let id = user.id;
                         let createdAt = data.body.created_at;
                         let content = data.body.content;
                         $('#comment-list').append(`
-                    <li
-                                            class="list-group-item list-group-item-action my-2 border boder-info rounded">
-                                            <div class="container">
-                                                <div class="row justify-content-between border-bottom mb-3">
-                                                    <a class="text-dark h6" href="/publications/${id}">
-                                                        ${completeName}
-                                                    </a>
-                                                    <small class="text-dark">
-                                                        ${createdAt}
-                                                    </small>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <p class="oldComment collapse show">
-                                                            ${content}
-                                                        </p>
-                                                        <form class="row collapse" action="a" method="post">
-                                                            <input type="hidden" name="comment_id" value="asd">
-                                                            <textarea name="content"
-                                                                class="form-control"></textarea>
-                                                            <button class="badge bg-dark">
-                                                                Guardar
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
+                        <li
+                            class="list-group-item list-group-item-action my-2 border boder-info rounded">
+                            <div class="container">
+                                <div class="row justify-content-between border-bottom mb-3">
+                                    <a class="text-dark h6" href="/publications/${id}">
+                                        ${completeName}
+                                    </a>
+                                    <small class="text-dark">
+                                        ${createdAt}
+                                    </small>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="oldComment collapse show">
+                                            ${content}
+                                        </p>
+                                        <form class="row collapse" action="a" method="post">
+                                            <input type="hidden" name="comment_id" value="asd">
+                                            <textarea name="content"
+                                                class="form-control"></textarea>
+                                            <button class="badge bg-dark">
+                                                Guardar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
                     `);
                     }
                 </script>

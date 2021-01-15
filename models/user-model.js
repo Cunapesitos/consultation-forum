@@ -13,8 +13,6 @@ class UserModel {
             data.password = hash;
             data.created_at = moment().format();
             delete data.password_confirmation;
-            //console.log("Inserting user...");
-            //console.log(data);
             var query = connection.query('insert into users set ?', data,
                 (error, results, fields) => {
                     if (error) {
@@ -22,7 +20,6 @@ class UserModel {
                         reject(error);
                     }
                     console.log("----------------------------------USER CREATED----------------------------");
-                    //console.log("SQL executed:");
                     console.log(query.sql);
                     resolve(data);
                 });

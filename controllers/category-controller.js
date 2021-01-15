@@ -23,8 +23,6 @@ class CategoryController {
             message: message,
             body: body
         });
-        //console.log("response:");
-        //console.log(JSON.parse(response));
         res.end(response);
     }
 

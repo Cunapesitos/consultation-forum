@@ -4,7 +4,7 @@ var Validator = require('Validator');
 var PublicationModel = require('../models/publication-model');
 var UserModel = require('../models/user-model');
 var CommentModel = require('../models/comment-model');
-var PublicationCategoryModel = require('../models/publication-category-model');
+var PublicationCategoryModel = require('../models/group-category-model');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();
@@ -20,33 +20,18 @@ class PublicationController {
 
     register = async (req, res) => {
         let request = (await this.getRequest(req)).data;
-        //console.log("request:");
-        //console.log(request);
         if (request == undefined)
             return this.response(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
             title: 'required',
             content: 'required',
-            user_id: 'required|numeric'
+            user_id: 'required|numeric',
+            category_id: 'required|numeric'
         });
+        if (v.fails())
+            return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
         try {
-            var categoriesFromPublication = request.categories;
-            delete request.categories;
-            if (v.fails())
-                return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
             var newPublication = await publication.create(request);
-            categoriesFromPublication.forEach(element => {
-                v = Validator.make(element, {
-                    id: 'required|numeric'
-                });
-                if (v.fails())
-                    return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
-            });
-            try {
-                publicationCategory.createFromAPublication(newPublication.id, categoriesFromPublication);
-            } catch (e) {
-                return this.sendResponse(res, 500, e.message, e);
-            }
             return this.sendResponse(res, 201, "Publication created.", newPublication);
         } catch (e) {
             return this.sendResponse(res, 500, e.message, e);
@@ -78,12 +63,10 @@ class PublicationController {
             return this.sendView(res, 'not-found');
         let userOwner = await user.getUserById(publicationFound.user_id);
         let publicationComments = await comment.getFromPublicationId(id);
-        let publicationCategories = await publicationCategory.getFromPublicationId(id);
         this.sendView(res, 'publication', {
             publication: publicationFound,
             user: userOwner,
-            comments: publicationComments,
-            categories: publicationCategories
+            comments: publicationComments
         });
     }
 

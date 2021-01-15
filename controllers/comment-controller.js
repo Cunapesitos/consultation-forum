@@ -12,14 +12,12 @@ class CommentController {
 
     register = async (req, res) => {
         let request = (await this.getRequest(req)).data;
-        //console.log("request:");
-        //console.log(request);
         if (request == undefined)
             return this.response(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
             content: 'required',
             publication_id: 'required|numeric',
-            user_id: 'required|numeric',
+            user_id: 'required|numeric'
         });
         if (v.fails())
             return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
@@ -29,28 +27,6 @@ class CommentController {
         } catch (e) {
             return this.sendResponse(res, 500, e.message, e);
         }
-    }
-
-    publicationsView = (res) => {
-        this.sendView(res, 'mine');
-    }
-
-    getPublicationsFromUserId = async (res, userId) => {
-        let publications = await publication.getFromUserId(userId);
-        let userOwner = await user.getUserById(userId);
-        this.sendView(res, 'publications', {
-            publications: publications,
-            user: userOwner
-        });
-    }
-
-    getPublication = async (res, id) => {
-        let publicationFound = await publication.getFromId(id);
-        let userOwner = await user.getUserById(publicationFound.user_id);
-        this.sendView(res, 'publication', {
-            publication: publicationFound,
-            user: userOwner
-        });
     }
 
     sendResponse = (res, code, message, body = {}) => {

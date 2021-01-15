@@ -40,7 +40,7 @@
                                     <label class="form-label">Category</label>
                                     <input id="input-search" name="categories-result"
                                         class="form-control border-dark input-search" placeholder="Search categories" />
-                                    <ul id="categories-result" class="dropdown-menu ms-2 p-0">
+                                    <ul id="categories-result" class="dropdown-menu p-0">
                                         <li><button class="dropdown-item ">No results</button></li>
                                     </ul>
                                     <small id="category_id-errors" class="text-danger"></small>
@@ -48,11 +48,10 @@
                             </div>
                             <div class="row">
                                 <div class="mb-3 col">
-                                    <label class="form-label">Categories</label>
+                                    <label class="form-label">Category</label>
                                     <div>
                                         <div class="row">
                                             <div class="col" id="categories-selected">
-
                                             </div>
                                         </div>
                                     </div>
@@ -104,10 +103,6 @@
                                 // }
                             });
 
-                            $('#input-search').on('input', function () {
-                                $('#categories-result').removeClass('myShow');
-                            });
-
                             $('#btn-submit').on('click', () => {
                                 let title = $('#title').val();
                                 let content = $('#content').val();
@@ -118,7 +113,7 @@
                                     title: title,
                                     content: content,
                                     user_id: userId,
-                                    categories: categoriesSelected
+                                    category_id: categoriesSelected[0].category_id
                                 }, (status, data) => {
                                     switch (status) {
                                         case 201:
@@ -140,36 +135,27 @@
                                 callGet('/search/categories/' + word, (status, data) => {
                                     if (status == 200) {
                                         let categories = data.body.categories;
-                                        //console.log(categories);
                                         $('#' + id).text('');
                                         if (categories.length == 0) {
-                                            //console.log("1 time");
                                             $('#' + id).append(`
-                                        <li><button class="dropdown-item">No results</button></li>
-                                    `);
+                                                <li><button class="dropdown-item">No results</button></li>
+                                            `);
                                         }
                                         categories.forEach(element => {
                                             let selected = false;
                                             categoriesSelected.forEach(selectedElement => {
-                                                if (!selected) selected = element.id == selectedElement.id;
+                                                if (!selected) selected = element.id == selectedElement.category_id;
                                             });
                                             if (!selected)
                                                 $('#' + id).append(`
-                                            <li class="justify-content-center">
-                                                <button onclick="addCategory(${element.id},'${element.name}')" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
-                                                    ${element.name}
-                                                </button>
-                                            </li>
-                                        `);
-                                            // $('#' + id).append(`
-                                            // <option value="${element.id}">${element.name}</option>
-                                            // `);
+                                                    <li class="justify-content-center">
+                                                        <button onclick="addCategory(${element.id},'${element.name}')" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
+                                                            ${element.name}
+                                                        </button>
+                                                    </li>
+                                                `);
                                         });
                                         $('#' + id).addClass('myShow show');
-                                        // $('#' + id).append(`
-                                        //     <li><hr class="dropdown-divider"></li>
-                                        //     <li><a class="dropdown-item" href="/category">Añadir categoria</a></li> 
-                                        // `);
                                     }
                                 }, false);
                             }
@@ -179,13 +165,14 @@
                                 let categoriesSelected = getFromLocalStorage('categories-selected');
                                 if (id == 0) {
                                     $('#categories-selected').append(`
-                                <div class="col">No categories selected</div>
-                            `);
+                                        <div class="col">No categories selected</div>
+                                    `);
                                     categoriesSelected = [];
                                 }
                                 else {
+                                    categoriesSelected = [];
                                     $('#categories-selected').text('');
-                                    categoriesSelected.push({ id: id, name: name });
+                                    categoriesSelected.push({ category_id: id, name: name });
                                 }
                                 saveInLocalStorage('categories-selected', categoriesSelected);
                                 refreshCategoryList();
@@ -195,16 +182,16 @@
                                 $('.input-search').val("");
                                 $('#categories-result').text("");
                                 $('#categories-result').append(`
-                            <li><button class="dropdown-item">No results</button></li>
-                        `);
+                                    <li><button class="dropdown-item">No results</button></li>
+                                `);
                             }
 
                             function refreshCategoryList() {
                                 let categoriesSelected = getFromLocalStorage('categories-selected');
                                 categoriesSelected.forEach(element => {
                                     $('#categories-selected').append(`
-                                <span class="badge bg-light text-dark border border-dark" id="${element.id}">${element.name}</span>
-                            `);
+                                        <span class="badge bg-light text-dark border border-dark" id="${element.category_id}">${element.name}</span>
+                                    `);
                                 });
                             }
 

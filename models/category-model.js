@@ -13,7 +13,7 @@ class CategoryModel {
                         console.log("Category error.");
                         reject(error);
                     }
-                    console.log("Categorire found.");
+                    console.log("Categories found.");
                     //console.log("SQL executed:");
                     //console.log(query.sql);
                     console.log(results);
@@ -43,33 +43,19 @@ class CategoryModel {
         });
     }
 
-    getFromPublicationId = async (publicationId) => {
+    getFromGroupId = async (groupId) => {
         return new Promise(async (resolve, reject) => {
             var query = connection.query(`
-                select comments.*, users.* from comments, users, publications publications
-                where publications.id = ? 
-                    and comments.publication_id = publications.id
-                    and users.id = comments.user_id`, publicationId,
+                select categories.* from groups_categories, categories
+                where group_id = ? 
+                    and categories.id = groups_categories.category_id`, groupId,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Category error.");
+                        console.log("Group category error.");
                         reject(error);
                     }
-                    console.log("Categories found.");
-                    //console.log("SQL executed:");
-                    //console.log(query.sql);
-                    //console.log('results');
+                    console.log("Groups categories found.");
                     console.log(results);
-                    Object.keys(results).map(function (key, indexA) {
-                        Object.keys(results[indexA]).map(function (key, index) {
-                            //console.log(key);
-                            if (key == 'created_at') {
-                                results[indexA][key] = moment(results[indexA][key]).locale('en').format('LLLL');
-                                //console.log("THIS IS CHANGED");
-                                //console.log(results[indexA][key]);
-                            }
-                        });
-                    });
                     resolve(results);
                 });
         });
