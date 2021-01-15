@@ -8,12 +8,12 @@ exports.execute = async function () {
 
     //addColumn('categories', 'style varchar(15) NOT NULL after name');
 
-    // deleteTable('comments');
-    // deleteTable('groups_categories');
-    // deleteTable('publications');
-    // deleteTable('categories');
-    // deleteTable('groups');
-    // deleteTable('users');
+    deleteTable('comments');
+    deleteTable('groups_categories');
+    deleteTable('publications');
+    deleteTable('categories');
+    deleteTable('groups');
+    deleteTable('users');
 
     // users
     connection.query(`
