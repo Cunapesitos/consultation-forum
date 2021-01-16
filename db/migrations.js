@@ -8,14 +8,13 @@ exports.execute = async function () {
 
     //addColumn('categories', 'style varchar(15) NOT NULL after name');
 
-    deleteTable('comments');
-    deleteTable('groups_categories');
-    deleteTable('publications_categories');
-    deleteTable('publications');
-    deleteTable('categories');
-    deleteTable('groups');
-    deleteTable('grops');
-    deleteTable('users');
+    // deleteTable('comments');
+    // deleteTable('groups_categories');
+    // deleteTable('publications_categories');
+    // deleteTable('publications');
+    // deleteTable('categories');
+    // deleteTable('grops');
+    // deleteTable('users');
 
     // users
     connection.query(`
@@ -38,8 +37,7 @@ exports.execute = async function () {
     connection.query(`
         create table if not exists categories(
             id int(5) unsigned AUTO_INCREMENT primary key,
-            name varchar(30) not null unique,
-            style varchar(15) not null,
+            name varchar(40) not null unique,
             created_at timestamp
         )`,
         (error, results, fields) => {
@@ -115,7 +113,7 @@ exports.execute = async function () {
         }
     );
 
-    // category seeder
+    // user seeder
     const hash = await bcrypt.hash(process.env.APP_SECRET_PASSWORD, salt);
     connection.query(`
         INSERT IGNORE INTO \`users\` (\`id\`, \`name\`, \`lastname\`, \`email\`, \`password\`, \`access_token\`, \`created_at\`) 
@@ -130,16 +128,25 @@ exports.execute = async function () {
 
     // category seeder
     connection.query(`
-        INSERT IGNORE INTO \`categories\` (\`id\`, \`name\`, \`style\`, \`created_at\`) 
+        INSERT IGNORE INTO \`categories\` (\`id\`, \`name\`, \`created_at\`) 
         VALUES 
-        ('1', 'Base de datos', 'success', current_timestamp()),
-        ('2', 'Java', 'warning', current_timestamp()),
-        ('3', 'Calculo 1', 'info', current_timestamp()),
-        ('4', 'Calculo 2', 'dark', current_timestamp()),
-        ('5', 'Programacion 1', 'white', current_timestamp()),
-        ('6', 'Programacion 2', 'secondary', current_timestamp()),
-        ('7', 'Algebra lineal', 'danger', current_timestamp()),
-        ('8', 'Ingles 1', 'danger', current_timestamp());
+        ('1', 'Intro', current_timestamp()),
+        ('2', 'Programacion 1', current_timestamp()),
+        ('3', 'Programacion 2', current_timestamp()),
+        ('4', 'Estructuras de datos 1', current_timestamp()),
+        ('5', 'Estructuras de datos 2', current_timestamp()),
+        ('6', 'Sistemas operativos 1', current_timestamp()),
+        ('7', 'Sistemas operativos 2', current_timestamp()),
+        ('8', 'Ingles 1', current_timestamp()),
+        ('9', 'Ingles 2', current_timestamp()),
+        ('10', 'Estructuras discretas', current_timestamp()),
+        ('11', 'Algebra lineal', current_timestamp()),
+        ('12', 'Calculo 1', current_timestamp()),
+        ('13', 'Calculo 2', current_timestamp()),
+        ('14', 'Ecuaciones diferenciales', current_timestamp()),
+        ('15', 'Arquitectura de software', current_timestamp()),
+        ('16', 'Topicos', current_timestamp()),
+        ('17', 'Grafica', current_timestamp());
     `,
         (error, results, fields) => {
             if (error) return console.log(error.message);

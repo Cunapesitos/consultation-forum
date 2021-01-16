@@ -67,6 +67,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/group">Groups</a>
                     </li>
+                    <li class="ms-3 nav-item">
+                        <div class="dropdown">
+                        <input id="search-users-input" class="form-control me-2" type="text"
+                            placeholder="Search users...">
+                        <ul id="users-result" class="dropdown-menu p-0 mx-auto"
+                            aria-labelledby="group-input-search">
+                        </ul>
+                    </div>
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -245,6 +254,45 @@
             let id = $(this).attr('id');
             $(`#${id}-errors`).text("");
         });
+
+        $('#search-users-input').on('input', function () {
+            $('#search-users-input').dropdown();
+            $('#search-users-input').addClass('show');
+            $('#users-result').addClass('show');
+            let word = $(this).val();
+            if (!word) clearInput();
+            else setUsers('users-result', word);
+        });
+
+        $(document).click(function (e) {
+            if (!$('#users-result').is(e.target) && $('#users-result').has(e.target).length === 0) {// if div is not target nor its descendant
+                $('#users-result').removeClass('show');
+            }
+        });
+
+        function setUsers(id, word) {
+            callGet('/search/users/' + word, (status, data) => {
+                if (status == 200) {
+                    let users = data.body.users;
+                    $('#' + id).text('');
+                    if (users.length == 0) {
+                        $('#' + id).append(`
+                            <li><button class="dropdown-item">No results</button></li>
+                        `);
+                    }
+                    users.forEach(element => {
+                        $('#' + id).append(`
+                            <li class="justify-content-center">
+                                <button onclick="window.location.href='/publications/${element.id}'" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
+                                    ${element.name + " " + element.lastname}
+                                </button>
+                            </li>
+                        `);
+                    });
+                    $('#' + id).addClass('show');
+                }
+            }, false);
+        }
 
     </script>
 

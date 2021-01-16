@@ -89,6 +89,7 @@ async function handleRouteWithParams(req, res) {
         switch (tableName) {
             case 'categories': return categoryController.search(res, word);
             case 'groups': return groupController.search(res, word);
+            case 'users': return userController.search(res, word);
             default: controller.sendView(res, 'not-found'); break;
         }
     } else if (req.url.match(/\/search\/\w+\/\w+/)) {

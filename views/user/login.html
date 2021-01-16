@@ -30,12 +30,12 @@
                             <div class="mb-3 mt-4">
                                 <label class="form-label">Email address</label>
                                 <input type="email" id="email" class="form-control border-dark"
-                                    aria-describedby="emailHelp">
+                                    aria-describedby="emailHelp" name="email">
                                 <small id="email-errors" class="text-danger"></small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Password</label>
-                                <input type="password" id="password" class="form-control border-dark" </div>
+                                <input type="password" id="password" class="form-control border-dark" name="password" />
                                 <small id="password-errors" class="text-danger"></small>
                             </div>
                             <div class="mb-3">
@@ -97,17 +97,8 @@
                                 let user = body.user;
                                 saveInLocalStorage('access_token', access_token);
                                 saveInLocalStorage('user', user);
-                                // callGet('/categories', (status, data)=>{
-                                //     switch (status) {
-                                //         case 200:
-                                //             saveInLocalStorage('categories', data.body);
                                 if (getFromLocalStorage('back')) window.history.back();
                                 else window.location.href = "/publications/" + user.id;
-                                //             break;
-                                //         default:
-                                //             break;
-                                //     }
-                                // });
                             }
                         </script>
                         <%} %>

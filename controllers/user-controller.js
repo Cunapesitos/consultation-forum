@@ -52,8 +52,6 @@ class UserController {
 
     login = async (req, res) => {
         let request = (await this.getRequest(req)).data;
-        //console.log("request:");
-        //console.log(request);
         if (request == undefined)
             return this.sendResponse(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
@@ -75,6 +73,11 @@ class UserController {
             return this.sendResponse(res, 200, "Login ok.", { user: userLogin, access_token });
         }
         return this.sendResponse(res, 400, "Incorrect password.", { password: ["Incorrect password."] });
+    }
+
+    search = async (res, word) => {
+        var users = await user.search(word);
+        return this.sendResponse(res, 200, "Users found.", { users: users });
     }
 
     sendResponse = (res, code, message, body = {}) => {

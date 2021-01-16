@@ -133,12 +133,25 @@ class UserModel {
         });
     }
 
-    //     var sorter = 'date';
-    // var sql    = 'SELECT * FROM posts ORDER BY ' + connection.escapeId(sorter);
-    // connection.query(sql, function (error, results, fields) {
-    //   if (error) throw error;
-    //   // ...
-    // });
+    search = async (word) => {
+        return new Promise(async (resolve, reject) => {
+            let aux = "";
+            word.split('%20').forEach(element => {
+                aux += element + "%";
+            });
+            console.log(aux);
+            var query = connection.query(`select * from users where name LIKE '%${aux}' limit 10;`,
+                (error, results, fields) => {
+                    if (error) {
+                        console.log("User error.");
+                        reject(error);
+                    }
+                    console.log("Users found.");
+                    console.log(results);
+                    resolve(results);
+                });
+        });
+    }
 }
 
 module.exports = UserModel;
