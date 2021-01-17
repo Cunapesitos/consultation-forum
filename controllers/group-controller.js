@@ -122,6 +122,7 @@ class GroupController {
                 group.categories = categories;
                 if (index === array.length - 1) resolve();
             });
+            resolve();
         });
         bar.then(() => {
             return this.sendView(res, "groups", { groups: groups });
@@ -148,6 +149,8 @@ class GroupController {
         if (!userFound)
             return this.sendView(res, 'not-found');
         var groups = await group.getFromUserId(userFound.id);
+        if (!groups[0])
+            return this.sendView(res, "groups", { groups: [] });
         var bar = new Promise((resolve, reject) => {
             groups.forEach(async (group, index, array) => {
                 let categories = await groupCategory.getFromGroupId(group.id);
