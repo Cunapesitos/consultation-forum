@@ -76,9 +76,7 @@ class GroupController {
             category_id: 'required|numeric',
             group_id: 'required|numeric'
         });
-        console.log("sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
         if (v.fails()) {
-            console.log("sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
             let groupFound = await group.getFromId(req.body.group_id);
             if (!groupFound)
                 return this.sendView(res, 'not-found');
@@ -93,9 +91,7 @@ class GroupController {
                 errors: v.getErrors()
             });
         } else {
-            console.log("ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
             let publicationSaved = await publication.create(request);
-            console.log("sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
             let groupFound = await group.getFromId(req.body.group_id);
             if (!groupFound)
                 return this.sendView(res, 'not-found');
@@ -116,13 +112,14 @@ class GroupController {
         if (!word)
             return this.sendView(res, 'register', { errors: { word: ['A word is required.'] } });
         var groups = await group.search(word);
+        if (!groups[0])
+            return this.sendView(res, "groups", { groups: [] });
         var bar = new Promise((resolve, reject) => {
             groups.forEach(async (group, index, array) => {
                 var categories = await category.getFromGroupId(group.id);
                 group.categories = categories;
                 if (index === array.length - 1) resolve();
             });
-            resolve();
         });
         bar.then(() => {
             return this.sendView(res, "groups", { groups: groups });
@@ -157,7 +154,6 @@ class GroupController {
                 group.categories = categories;
                 if (index === array.length - 1) resolve();
             });
-            resolve();
         });
         bar.then(() => {
             return this.sendView(res, "groups", { groups: groups });
