@@ -1,8 +1,8 @@
 'use strict'
 
 var Validator = require('Validator');
-var UserModel = require('../models/user-model');
-var PublicationModel = require('../models/publication-model');
+var UserModel = require('../models/UserModel');
+var PublicationModel = require('../models/PublicationModel');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();

@@ -1,7 +1,7 @@
 'use strict'
 
 var moment = require('moment');
-var connection = require('../db/connection').Connection;
+var connection = require('../db/Connection').Connection;
 
 class GroupModel {
 

@@ -1,11 +1,11 @@
 'use strict'
 
 var Validator = require('Validator');
-var PublicationModel = require('../models/publication-model');
-var UserModel = require('../models/user-model');
-var CommentModel = require('../models/comment-model');
-var PublicationCategoryModel = require('../models/group-category-model');
-var CategoryModel = require('../models/category-model');
+var PublicationModel = require('../models/PublicationModel');
+var UserModel = require('../models/UserModel');
+var CommentModel = require('../models/CommentModel');
+var PublicationCategoryModel = require('../models/GroupCategoryModel');
+var CategoryModel = require('../models/CategoryModel');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();

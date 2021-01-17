@@ -1,6 +1,6 @@
 'use strict'
 
-var connection = require('./connection').Connection;
+var connection = require('./Connection').Connection;
 var bcrypt = require('bcrypt');
 let salt = +process.env.APP_SECRET_SALT_OR_ROUNDS_COUNT;
 

@@ -1,14 +1,20 @@
 'use strict'
 
 var Validator = require('Validator');
-var CommentModel = require('../models/comment-model');
-var UserModel = require('../models/user-model');
+var CategoryModel = require('../models/CategoryModel');
+var UserModel = require('../models/UserModel');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();
-var comment = new CommentModel();
+var category = new CategoryModel();
 
-class CommentController {
+class CategoryController {
+
+    search = async (req, res) => {
+        let word = req.params.word;
+        var categories = await category.search(word);
+        return this.sendResponse(res, 200, "Categories found.", { categories: categories });
+    }
 
     sendResponse = (res, code, message, body = {}) => {
         console.log("Sending response:" + message);
@@ -18,13 +24,11 @@ class CommentController {
             message: message,
             body: body
         });
-        //console.log("response:");
-        //console.log(JSON.parse(response));
         res.end(response);
     }
 
-    sendView = (res, file, data) => {
-        console.log("Sending view:" + file);
+    sendView = (res, file, data = {}) => {
+        console.log("Sendingd view:" + file);
         views.render(`./views/publication/${file}`, { data, host: process.env.APP_HOST }, (error, str) => {
             res.statusCode = 200;
             res.setHeader('Content-type', 'text/html');
@@ -50,4 +54,4 @@ class CommentController {
     }
 }
 
-module.exports = CommentController;
+module.exports = CategoryController;

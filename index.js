@@ -10,12 +10,12 @@ var bodyParser = require('body-parser');
 
 var app = express();
 
-const Controller = require('./controllers/controller');
-const UserController = require('./controllers/user-controller');
-const PublicationController = require('./controllers/publication-controller');
-const CommentController = require('./controllers/comment-controller');
-const CategoryController = require('./controllers/category-controller');
-const GroupController = require('./controllers/group-controller');
+const Controller = require('./controllers/Controller');
+const UserController = require('./controllers/UserController');
+const PublicationController = require('./controllers/PublicationController');
+const CommentController = require('./controllers/CommentController');
+const CategoryController = require('./controllers/CategoryController');
+const GroupController = require('./controllers/GroupController');
 const userController = new UserController();
 const controller = new Controller();
 const publicationController = new PublicationController();
