@@ -154,6 +154,7 @@ class GroupController {
                 group.categories = categories;
                 if (index === array.length - 1) resolve();
             });
+            resolve();
         });
         bar.then(() => {
             return this.sendView(res, "groups", { groups: groups });

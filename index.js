@@ -53,3 +53,4 @@ app.post('/comment', publicationController.registerComment);
 app.post('/group', groupController.register);
 app.post('/group/publication', groupController.registerPublication);
 app.post('/search/groups', groupController.search);
+app.post('/search/users', userController.search);

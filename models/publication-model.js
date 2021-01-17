@@ -15,7 +15,7 @@ class PublicationModel {
                         reject(error);
                     }
                     console.log("----------------------------------PUBLICATION CREATED----------------------------");
-                    console.log(results[0]);
+                    console.log(results);
                     data.id = results.insertId;
                     resolve(data);
                 });

@@ -20,36 +20,45 @@
                             </div>
                         </div>
                     </div>
+                    <form action="/register" method="post">
                     <div class="row">
                         <div class="mb-3 col">
                             <label class="form-label">Name(s)</label>
-                            <input type="text" id="name" class="form-control border-dark" aria-describedby="emailHelp">
-                            <small id="name-errors" class="text-danger"></small>
+                            <input type="text" name="name" class="form-control border-dark" aria-describedby="emailHelp">
+                            <% if (data.errors && data.errors.name) { %>
+                                <small id="email-errors" class="text-danger"><%= data.errors.name[0] %></small>
+                                <% } %>
                         </div>
                         <div class="mb-3 col">
                             <label class="form-label">Lastname(s)</label>
-                            <input type="text" id="lastname" class="form-control border-dark"
+                            <input type="text" name="lastname" class="form-control border-dark"
                                 aria-describedby="emailHelp">
-                            <small id="lastname-errors" class="text-danger"></small>
+                                <% if (data.errors && data.errors.lastname) { %>
+                                    <small id="email-errors" class="text-danger"><%= data.errors.lastname[0] %></small>
+                                    <% } %>
                         </div>
                     </div>
                     <div class="row d-flex justify-content-center">
                         <div class="mb-3 col-9">
                             <label class="form-label">Email address</label>
-                            <input type="email" id="email" class="form-control border-dark"
+                            <input type="email" name="email" class="form-control border-dark"
                                 aria-describedby="emailHelp">
-                            <small id="email-errors" class="text-danger"></small>
+                                <% if (data.errors && data.errors.email) { %>
+                                    <small id="email-errors" class="text-danger"><%= data.errors.email[0] %></small>
+                                    <% } %>
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
                             <label class="form-label">Password</label>
-                            <input type="password" id="password" class="form-control border-dark">
-                            <small id="password-errors" class="text-danger"></small>
+                            <input type="password" name="password" class="form-control border-dark">
+                            <% if (data.errors && data.errors.password) { %>
+                                <small id="email-errors" class="text-danger"><%= data.errors.password[0] %></small>
+                                <% } %>
                         </div>
                         <div class="mb-3 col">
                             <label class="form-label">Confirm password</label>
-                            <input type="password" id="password_confirmation" class="form-control border-dark">
+                            <input type="password" name="password_confirmation" class="form-control border-dark">
                         </div>
                     </div>
                     <div class="row mt-4">
@@ -58,43 +67,15 @@
                                 <button type="button" id="btn-cancel" class="btn btn-outline-dark">
                                     Cancel
                                 </button>
-                                <button type="button" id="btn-submit" class="btn btn-dark col-3">
+                                <button type="submit" id="btn-submit" class="btn btn-dark col-3">
                                     Register
                                 </button>
                             </div>
                         </div>
                     </div>
+                </form>
                 </div>
             </div>
         </div>
         <%} %>
-            <%{ script %>
-                <script>
-                    $('#btn-submit').on('click', () => {
-                        callPost('/register', {
-                            name: $('#name').val(),
-                            lastname: $('#lastname').val(),
-                            email: $('#email').val(),
-                            password: $('#password').val(),
-                            password_confirmation: $('#password_confirmation').val()
-                        }, (status, data) => {
-                            //console.log(data);
-                            switch (status) {
-                                case 400:
-                                    handleVerifications(data);
-                                    break;
-                                case 201:
-                                    alert("Registration complete, please log in.");
-                                    removeFromLocalStorage('back');
-                                    window.location.href = "/login";
-                                    break;
-                                default:
-                                    alert(data.message);
-                                    break;
-                            }
-                        }
-                        );
-                    });
-
-                </script>
-                <%} %>
+    

@@ -17,11 +17,9 @@ class UserController {
     }
 
     register = async (req, res) => {
-        let request = (await this.getRequest(req)).data;
-        //console.log("request:");
-        //console.log(request);
+        let request = req.body;
         if (request == undefined)
-            return this.response(res, 400, "Validation failed.", { data: {} });
+            return this.sendView(res, "register", { data: {} });
         var name = request.name;
         var lastname = request.lastname;
         request.name = request.name.split(' ').join('');
@@ -30,22 +28,23 @@ class UserController {
             name: 'required|alpha',
             lastname: 'required|alpha',
             email: 'required|email',
-            password: 'required|confirmed',
-            // role: 'required|alpha',
+            password: 'required|confirmed'
         });
         if (v.fails())
-            return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
+            return this.sendView(res, "register", { errors: v.getErrors() });
         request.name = name;
         request.lastname = lastname;
         try {
             var newUser = await user.create(request);
-            return this.sendResponse(res, 201, "User created.", newUser);
+            return this.sendView(res, "login", { message: "Please login." });
         } catch (e) {
             if (e.code == 'ER_DUP_ENTRY')
-                return this.sendResponse(res, 400, "Email is already taken.", {
-                    email: ["Email already used."]
+                return this.sendView(res, "register", {
+                    errors: {
+                        email: ["Email already used."]
+                    }
                 });
-            return this.sendResponse(res, 500, e.message, e);
+            return this.sendView(res, 'register');
         }
     }
 
@@ -56,7 +55,6 @@ class UserController {
 
     login = async (req, res) => {
         let request = req.body;
-        console.log(request);
         if (request == undefined)
             return this.sendResponse(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
@@ -76,31 +74,37 @@ class UserController {
         }
         let publications = await publication.getFromUserId(userId);
         localStorage.setItem('user', JSON.stringify(userLogin));
-        return this.sendView(res, 'profile', { publications });
+        return this.sendView(res, 'profile', { publications, user: userLogin });
     }
 
-    search = async (res, word) => {
-        var users = await user.search(word);
-        return this.sendResponse(res, 200, "Users found.", { users: users });
+    search = async (req, res) => {
+        let word = req.body.word;
+        if (!word) {
+            let userId = JSON.parse(localStorage.getItem('user')).id;
+            let userOwner = await user.getUserById(userId);
+            if (!userOwner)
+                return this.sendView(res, 'not-found');
+            let publications = await publication.getFromUserId(userId);
+            return this.sendView(res, 'profile', {
+                user: userOwner,
+                publications: publications
+            });
+        } else {
+            var users = await user.search(word);
+            return this.sendView(res, "users", { users: users });
+        }
     }
 
     profile = async (req, res) => {
         let userId = req.params.id;
-        try {
-            let userOwner = await user.getUserById(userId);
-            if (!userOwner)
-                return this.sendView(res, 'not-found');
-        } catch (e) {
+        let userOwner = await user.getUserById(userId);
+        if (!userOwner)
             return this.sendView(res, 'not-found');
-        }
-        try {
-            let publications = await publication.getFromUserId(userId);
-            this.sendView(res, 'profile', {
-                publications: publications
-            });
-        } catch (e) {
-            return this.sendView(res, 'not-found');
-        }
+        let publications = await publication.getFromUserId(userId);
+        return this.sendView(res, 'profile', {
+            user: userOwner,
+            publications: publications
+        });
     }
 
     sendView = (res, file, data = {}) => {

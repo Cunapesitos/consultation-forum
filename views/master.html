@@ -67,14 +67,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/group">Groups</a>
                     </li>
-                    <li class="ms-3 nav-item">
-                        <div class="dropdown">
-                            <input id="search-users-input" class="form-control me-2" type="text"
+                    <li class="ms-3 mt-1 nav-item">
+                        <form action="/search/users" method="post" class="d-flex">
+                            <input id="search-users-input" name="word" class="form-control me-2" type="text"
                                 placeholder="Search users...">
-                            <ul id="users-result" class="dropdown-menu p-0 mx-auto"
-                                aria-labelledby="group-input-search">
-                            </ul>
-                        </div>
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </form>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

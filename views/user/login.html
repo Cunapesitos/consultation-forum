@@ -56,4 +56,9 @@
                         </div>
                     </div>
                 </div>
+                <% if (data.message) { %>
+                    <script>
+                        alert("<%= data.message %>");
+                    </script>
+                    <% } %>
                 <%} %>
