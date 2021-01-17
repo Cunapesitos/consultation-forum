@@ -2,6 +2,8 @@
 
 let pejs = require('pejs');
 var views = pejs();
+var LocalStorage = require('node-localstorage').LocalStorage;
+var localStorage = new LocalStorage('./scratch');
 
 class Controller {
 
@@ -9,8 +11,8 @@ class Controller {
         this.sendResponse(res, 200, 'All ok.');
     }
 
-    redirectTo = (res, route) => {
-        res.writeHead(301, { 'Location': route });
+    redirectToLogin = (req, res) => {
+        res.writeHead(301, { 'Location': '/login' });
         res.end();
     }
 

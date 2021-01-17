@@ -3,7 +3,7 @@
         <div class="row align-items-top h-100 justify-content-center overflow-auto">
             <div class="col-9">
                 <h2 class="text-center py-3">
-                    <%= data.user.name %>'s publications
+                    <%= user.name %>'s publications
                 </h2>
                 <ul class="list-group h-100">
                     <% if (!data.publications[0]) { %>
@@ -13,7 +13,7 @@
                                 <div class="col">
                                     <div class="row align-items-center">
                                         <div class="col-1 p-0">
-                                            <img src="<%= host 5%>/icon.png" width="100alfalfa" height="100alfalfa">
+                                            <img src="<%= host %>/icon.png" width="100alfalfa" height="100alfalfa">
                                         </div>
                                         <div class="col">
                                             <div class="row justify-content-between">

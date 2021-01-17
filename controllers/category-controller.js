@@ -10,7 +10,8 @@ var category = new CategoryModel();
 
 class CategoryController {
 
-    search = async (res, word) => {
+    search = async (req, res) => {
+        let word = req.params.word;
         var categories = await category.search(word);
         return this.sendResponse(res, 200, "Categories found.", { categories: categories });
     }

@@ -27,22 +27,29 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 mt-4">
-                                <label class="form-label">Email address</label>
-                                <input type="email" id="email" class="form-control border-dark"
-                                    aria-describedby="emailHelp" name="email">
-                                <small id="email-errors" class="text-danger"></small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" id="password" class="form-control border-dark" name="password" />
-                                <small id="password-errors" class="text-danger"></small>
-                            </div>
-                            <div class="mb-3">
-                                <div class="row px-2 mt-4">
-                                    <button type="submit" id="btn-submit" class="btn btn-dark">Submit</button>
+                            <form action="/login" method="post">
+                                <div class="mb-3 mt-4">
+                                    <label class="form-label">Email address</label>
+                                    <input type="email" id="email" class="form-control border-dark"
+                                        aria-describedby="emailHelp" name="email">
+                                        <% if (data.errors && data.errors.email) { %>
+                                    <small id="email-errors" class="text-danger"><%= data.errors.email[0] %></small>
+                                    <% } %>
                                 </div>
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" id="password" class="form-control border-dark"
+                                        name="password" />
+                                        <% if (data.errors && data.errors.password) { %>
+                                            <small id="email-errors" class="text-danger"><%= data.errors.password[0] %></small>
+                                            <% } %>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="row px-2 mt-4">
+                                        <button type="submit" id="btn-submit" class="btn btn-dark">Submit</button>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="mb-3 text-center">
                                 <a href="/register">Create an account</a>
                             </div>
@@ -50,55 +57,3 @@
                     </div>
                 </div>
                 <%} %>
-                    <%{ script %>
-                        <script>
-                            $("input").keydown(function () {
-                                let id = $(this).attr('id');
-                                $(`#${id}-errors`).text("");
-                            });
-
-                            $('#btn-submit').on('click', () => {
-                                callPost('/login', {
-                                    email: $('#email').val(),
-                                    password: $('#password').val()
-                                }, (status, data) => {
-                                    //console.log(data);
-                                    switch (status) {
-                                        case 400:
-                                            handleVerifications(data);
-                                            break;
-                                        case 200:
-                                            handleLoginOk(data);
-                                            break;
-                                        default:
-                                            alert(data.message);
-                                            break;
-                                    }
-                                });
-                            });
-
-                            function handleVerifications(data) {
-                                //console.log(data);
-                                Object.keys(data.body).map(function (key, index) {
-                                    let errors = data.body[key];
-                                    errors.forEach(element => {
-                                        $(`#${key}-errors`).text("");
-                                    });
-                                    errors.forEach(element => {
-                                        $(`#${key}-errors`).append(element);
-                                        $(`#${key}-errors`).append('<br>');
-                                    });
-                                });
-                            }
-
-                            function handleLoginOk(data) {
-                                let body = data.body;
-                                let access_token = body.access_token;
-                                let user = body.user;
-                                saveInLocalStorage('access_token', access_token);
-                                saveInLocalStorage('user', user);
-                                if (getFromLocalStorage('back')) window.history.back();
-                                else window.location.href = "/publications/" + user.id;
-                            }
-                        </script>
-                        <%} %>

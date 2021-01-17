@@ -50,17 +50,16 @@ class UserModel {
 
     getUserById = async (id) => {
         return new Promise(async (resolve, reject) => {
-            var query = connection.query('select * from users where id = ?', id,
+            var query = connection.query('select * from users where id = ? ', id,
                 (error, results, fields) => {
                     if (error) {
                         console.log("User error.");
                         reject(error);
                     }
                     console.log("User found.");
-                    //console.log("SQL executed:");
-                    //console.log(query.sql);
-                    //console.log('results');
                     console.log(results[0]);
+                    if ((!results))
+                        resolve(null);
                     if (results[0])
                         delete results[0].password;
                     resolve(results[0]);
@@ -101,13 +100,11 @@ class UserModel {
                 name = ?,
                 lastname = ?,
                 email = ?,
-                access_token = ?
                 WHERE id = ?
             `, [
                 newUserData.name,
                 newUserData.lastname,
                 newUserData.email,
-                newUserData.access_token,
                 newUserData.id
             ], function (error, results, fields) {
                 if (error) {
@@ -121,9 +118,6 @@ class UserModel {
                             reject(error);
                         }
                         console.log("User found.");
-                        //console.log("SQL executed:");
-                        //console.log(query.sql);
-                        //console.log('results');
                         console.log(results[0]);
                         if (results[0])
                             delete results[0].password;

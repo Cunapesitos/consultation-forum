@@ -2,14 +2,17 @@
 
 var Validator = require('Validator');
 var UserModel = require('../models/user-model');
-var jwt = require('../auth/jwt');
+var PublicationModel = require('../models/publication-model');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();
+var publication = new PublicationModel();
+var LocalStorage = require('node-localstorage').LocalStorage;
+var localStorage = new LocalStorage('./scratch');
 
 class UserController {
 
-    registerView = (res) => {
+    registerView = (req, res) => {
         this.sendView(res, 'register');
     }
 
@@ -46,12 +49,14 @@ class UserController {
         }
     }
 
-    loginView = (res) => {
+    loginView = (req, res) => {
+        localStorage.setItem('user', 'null');
         this.sendView(res, 'login');
     }
 
     login = async (req, res) => {
-        let request = (await this.getRequest(req)).data;
+        let request = req.body;
+        console.log(request);
         if (request == undefined)
             return this.sendResponse(res, 400, "Validation failed.", { data: {} });
         var v = Validator.make(request, {
@@ -59,20 +64,19 @@ class UserController {
             password: 'required',
         });
         if (v.fails()) {
-            return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
+            return this.sendView(res, 'login', { errors: v.getErrors() });
         }
         let userLogin = await user.getUserByEmail(request.email);
         if (!userLogin)
-            return this.sendResponse(res, 400, "Email not registered.", { email: ["Email not registered."] });
+            return this.sendView(res, 'login', { errors: { email: ["Email not registered.", request.email] } });
         let userId = userLogin.id;
         let isCorrectPassword = await user.isCorrectPassword(request.password, userId);
-        if (isCorrectPassword) {
-            var access_token = jwt.createToken(userLogin);
-            userLogin.access_token = access_token;
-            userLogin = await user.updateUserById(userId, userLogin);
-            return this.sendResponse(res, 200, "Login ok.", { user: userLogin, access_token });
+        if (!isCorrectPassword) {
+            return this.sendView(res, 'login', { errors: { password: ["Incorrect password."] } });
         }
-        return this.sendResponse(res, 400, "Incorrect password.", { password: ["Incorrect password."] });
+        let publications = await publication.getFromUserId(userId);
+        localStorage.setItem('user', JSON.stringify(userLogin));
+        return this.sendView(res, 'profile', { publications });
     }
 
     search = async (res, word) => {
@@ -80,46 +84,41 @@ class UserController {
         return this.sendResponse(res, 200, "Users found.", { users: users });
     }
 
-    sendResponse = (res, code, message, body = {}) => {
-        console.log("Sending response: " + message);
-        res.statusCode = code;
-        res.setHeader('Content-type', 'application/json');
-        let response = JSON.stringify({
-            message: message,
-            body: body
-        });
-        //console.log("response:");
-        //console.log(JSON.parse(response));
-        res.end(response);
+    profile = async (req, res) => {
+        let userId = req.params.id;
+        try {
+            let userOwner = await user.getUserById(userId);
+            if (!userOwner)
+                return this.sendView(res, 'not-found');
+        } catch (e) {
+            return this.sendView(res, 'not-found');
+        }
+        try {
+            let publications = await publication.getFromUserId(userId);
+            this.sendView(res, 'profile', {
+                publications: publications
+            });
+        } catch (e) {
+            return this.sendView(res, 'not-found');
+        }
     }
 
     sendView = (res, file, data = {}) => {
         console.log("Sending view: " + file);
-        var myData = { data, host: process.env.APP_HOST };
-        //console.log(myData);
-        views.render(`./views/user/${file}`, myData, (error, str) => {
-            res.statusCode = 200;
-            res.setHeader('Content-type', 'text/html');
-            res.end(str);
-        });
+        var user = localStorage.getItem('user') == 'null' ? undefined : JSON.parse(localStorage.getItem('user'));
+        var myData = { user, data, host: process.env.APP_HOST };
+        console.log("With:");
+        console.log(myData);
+        if (file == 'not-found')
+            views.render(`./views/${file}`, myData, (error, str) => {
+                res.status(200).send(str);
+            });
+        else
+            views.render(`./views/user/${file}`, myData, (error, str) => {
+                res.status(200).send(str);
+            });
     }
 
-    getRequest = (req) => {
-        return new Promise((resolve, reject) => {
-            try {
-                let body = '';
-                req.on('data', (chunk) => {
-                    body += chunk.toString();
-                });
-                req.on('end', () => {
-                    let o = JSON.parse(body);
-                    resolve(o);
-                })
-            } catch (e) {
-                reject(e);
-            }
-        });
-    }
 }
 
 module.exports = UserController;

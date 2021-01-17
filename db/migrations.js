@@ -24,7 +24,6 @@ exports.execute = async function () {
         lastname varchar(30) not null,
         email varchar(30) not null unique,
         password text not null,
-        access_token text,
         created_at timestamp not null
     )`,
         (error, results, fields) => {
@@ -116,9 +115,9 @@ exports.execute = async function () {
     // user seeder
     const hash = await bcrypt.hash(process.env.APP_SECRET_PASSWORD, salt);
     connection.query(`
-        INSERT IGNORE INTO \`users\` (\`id\`, \`name\`, \`lastname\`, \`email\`, \`password\`, \`access_token\`, \`created_at\`) 
+        INSERT IGNORE INTO \`users\` (\`id\`, \`name\`, \`lastname\`, \`email\`, \`password\`, \`created_at\`) 
         VALUES 
-        ('1', 'Jorge Rodrigo', 'Torrez Aramayo', 'jorgerodrigotorrez@gmail.com', '${hash}',null, current_timestamp());
+        ('1', 'Jorge Rodrigo', 'Torrez Aramayo', 'jorgerodrigotorrez@gmail.com', '${hash}', current_timestamp());
     `,
         (error, results, fields) => {
             if (error) return console.log(error.message);

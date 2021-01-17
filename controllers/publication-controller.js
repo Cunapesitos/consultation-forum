@@ -5,23 +5,27 @@ var PublicationModel = require('../models/publication-model');
 var UserModel = require('../models/user-model');
 var CommentModel = require('../models/comment-model');
 var PublicationCategoryModel = require('../models/group-category-model');
+var CategoryModel = require('../models/category-model');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();
 var publication = new PublicationModel();
 var comment = new CommentModel();
 var publicationCategory = new PublicationCategoryModel();
+var category = new CategoryModel();
+var LocalStorage = require('node-localstorage').LocalStorage;
+var localStorage = new LocalStorage('./scratch');
 
 class PublicationController {
 
-    registerView = (res) => {
+    registerView = (req, res) => {
         this.sendView(res, 'register');
     }
 
     register = async (req, res) => {
-        let request = (await this.getRequest(req)).data;
+        let request = req.body;
         if (request == undefined)
-            return this.response(res, 400, "Validation failed.", { data: {} });
+            return this.sendView(res, "register");
         var v = Validator.make(request, {
             title: 'required',
             content: 'required',
@@ -29,44 +33,74 @@ class PublicationController {
             category_id: 'required|numeric'
         });
         if (v.fails())
-            return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
-        try {
-            var newPublication = await publication.create(request);
-            return this.sendResponse(res, 201, "Publication created.", newPublication);
-        } catch (e) {
-            return this.sendResponse(res, 500, e.message, e);
-        }
+            return this.sendView(res, 'register', { errors: v.getErrors() });
+        let newPublication = await publication.create(request);
+        let userOwner = await user.getUserById(newPublication.user_id);
+        let publicationComments = await comment.getFromPublicationId(newPublication.id);
+        let categoryFound = await category.getFromPublicationId(newPublication.id);
+        this.sendView(res, 'publication', {
+            publication: newPublication,
+            user: userOwner,
+            comments: publicationComments,
+            category: categoryFound
+        });
     }
 
-    publicationsView = (res) => {
-        this.sendView(res, 'mine');
-    }
-
-    getPublicationsFromUserId = async (res, userId) => {
-        let userOwner = await user.getUserById(userId);
-        if (!userOwner)
+    registerComment = async (req, res) => {
+        let request = req.body;
+        if (request == undefined)
             return this.sendView(res, 'not-found');
-        try {
-            let publications = await publication.getFromUserId(userId);
-            this.sendView(res, 'publications', {
-                publications: publications,
-                user: userOwner
+        var v = Validator.make(request, {
+            content: 'required',
+            publication_id: 'required|numeric',
+            user_id: 'required|numeric'
+        });
+        if (v.fails()) {
+            let id = req.body.publication_id;
+            let publicationFound = await publication.getFromId(id);
+            if (!publicationFound)
+                return this.sendView(res, 'not-found');
+            let userOwner = await user.getUserById(publicationFound.user_id);
+            let publicationComments = await comment.getFromPublicationId(id);
+            let categoryFound = await category.getFromPublicationId(id);
+            this.sendView(res, 'publication', {
+                publication: publicationFound,
+                user: userOwner,
+                comments: publicationComments,
+                category: categoryFound,
+                errors: v.getErrors()
             });
-        } catch (e) {
-            this.sendResponse(res, 500, e.message, e);
+        } else {
+            var newComment = await comment.create(request);
+            let id = req.body.publication_id;
+            let publicationFound = await publication.getFromId(id);
+            if (!publicationFound)
+                return this.sendView(res, 'not-found');
+            let userOwner = await user.getUserById(publicationFound.user_id);
+            let publicationComments = await comment.getFromPublicationId(id);
+            let categoryFound = await category.getFromPublicationId(id);
+            this.sendView(res, 'publication', {
+                publication: publicationFound,
+                user: userOwner,
+                comments: publicationComments,
+                category: categoryFound
+            });
         }
     }
 
-    getPublication = async (res, id) => {
+    getPublication = async (req, res) => {
+        let id = req.params.id;
         let publicationFound = await publication.getFromId(id);
         if (!publicationFound)
             return this.sendView(res, 'not-found');
         let userOwner = await user.getUserById(publicationFound.user_id);
         let publicationComments = await comment.getFromPublicationId(id);
+        let categoryFound = await category.getFromPublicationId(id);
         this.sendView(res, 'publication', {
             publication: publicationFound,
             user: userOwner,
-            comments: publicationComments
+            comments: publicationComments,
+            category: categoryFound
         });
     }
 
@@ -83,21 +117,19 @@ class PublicationController {
         res.end(response);
     }
 
-    sendView = (res, file, data) => {
-        console.log("Sending view:" + file);
-        var myData = { data, host: process.env.APP_HOST };
-        //console.log(myData);
-        if (file != 'not-found')
-            views.render(`./views/publication/${file}`, myData, (error, str) => {
-                res.statusCode = 200;
-                res.setHeader('Content-type', 'text/html');
-                res.end(str);
+    sendView = (res, file, data = {}) => {
+        console.log("Sending view: " + file);
+        var user = localStorage.getItem('user') == 'null' ? undefined : JSON.parse(localStorage.getItem('user'));
+        var myData = { user, data, host: process.env.APP_HOST };
+        console.log("With:");
+        console.log(myData);
+        if (file == 'not-found')
+            views.render(`./views/${file}`, myData, (error, str) => {
+                res.status(200).send(str);
             });
         else
-            views.render(`./views/${file}`, myData, (error, str) => {
-                res.statusCode = 200;
-                res.setHeader('Content-type', 'text/html');
-                res.end(str);
+            views.render(`./views/publication/${file}`, myData, (error, str) => {
+                res.status(200).send(str);
             });
     }
 

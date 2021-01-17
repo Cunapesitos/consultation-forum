@@ -10,25 +10,6 @@ var comment = new CommentModel();
 
 class CommentController {
 
-    register = async (req, res) => {
-        let request = (await this.getRequest(req)).data;
-        if (request == undefined)
-            return this.response(res, 400, "Validation failed.", { data: {} });
-        var v = Validator.make(request, {
-            content: 'required',
-            publication_id: 'required|numeric',
-            user_id: 'required|numeric'
-        });
-        if (v.fails())
-            return this.sendResponse(res, 400, "Validation failed.", v.getErrors());
-        try {
-            var newComment = await comment.create(request);
-            return this.sendResponse(res, 201, "Comment created.", newComment);
-        } catch (e) {
-            return this.sendResponse(res, 500, e.message, e);
-        }
-    }
-
     sendResponse = (res, code, message, body = {}) => {
         console.log("Sending response:" + message);
         res.statusCode = code;

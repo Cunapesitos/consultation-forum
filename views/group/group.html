@@ -64,63 +64,85 @@
                                                         Create a publication
                                                     </h5>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col-1">
-                                                        <label class="form-label text-right">Title</label>
-                                                    </div>
-                                                    <div class="mb-3 col">
-                                                        <input type="text" id="title" class="form-control border-dark">
-                                                        <small id="title-errors" class="text-danger"></small>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="mb-3 col">
-                                                        <label class="form-label">Choose one category:</label>
-                                                        <% data.categories.forEach(function(category){ %>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input category-option"
-                                                                    type="radio" name="inlineRadioOptions"
-                                                                    id="inlineRadio<%= category.id %>"
-                                                                    value="<%= category.id %>">
-                                                                <label
-                                                                    class="badge bg-light text-dark border border-dark"
-                                                                    for="inlineRadio<%= category.id %>">
-                                                                    <%= category.name %>
-                                                                </label>
-                                                            </div>
-                                                            <% }); %>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-1">
-                                                        <label class="form-label text-right">Content</label>
-                                                    </div>
-                                                    <div class="mb-3 col">
-                                                        <textarea id="content" rows="4"
-                                                            class="form-control border-dark"></textarea>
-                                                        <small id="content-errors" class="text-danger"></small>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="d-flex justify-content-between">
-                                                            <button onclick="closeForm()" type="button"
-                                                                class="btn btn-outline-dark col-3">
-                                                                Cancel
-                                                            </button>
-                                                            <button type="button" id="btn-submit"
-                                                                class="btn btn-dark col-3">
-                                                                Create
-                                                            </button>
+                                                <form action="/group/publication" method="post">
+                                                    <div class="row">
+                                                        <div class="mb-3 col-1">
+                                                            <label class="form-label text-right">Title</label>
+                                                        </div>
+                                                        <div class="mb-3 col">
+                                                            <input type="text" id="title" name="title"
+                                                                class="form-control border-dark">
+                                                            <input type="hidden" name="group_id"
+                                                                value="<%= data.group.id %>">
+                                                            <input type="hidden" name="user_id"
+                                                                value="<%= data.group.user_id %>">
+                                                            <% if (data.errors && data.errors.title) { %>
+                                                                <small id="email-errors" class="text-danger">
+                                                                    <%= data.errors.title[0] %>
+                                                                </small>
+                                                                <% } %>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                    <div class="row">
+                                                        <div class="mb-3 col">
+                                                            <label class="form-label">Choose one category:</label>
+                                                            <br>
+                                                            <% data.categories.forEach(function(category){ %>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input category-option"
+                                                                        type="radio" name="category_id"
+                                                                        id="inlineRadio<%= category.id %>"
+                                                                        value="<%= category.id %>">
+                                                                    <label
+                                                                        class="badge bg-light text-dark border border-dark"
+                                                                        for="inlineRadio<%= category.id %>">
+                                                                        <%= category.name %>
+                                                                    </label>
+                                                                </div>
+                                                                <br>
+                                                                <% }); %>
+                                                                    <% if (data.errors && data.errors.category_id) { %>
+                                                                        <small id="email-errors" class="text-danger">
+                                                                            <%= data.errors.category_id[0] %>
+                                                                        </small>
+                                                                        <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-1">
+                                                            <label class="form-label text-right">Content</label>
+                                                        </div>
+                                                        <div class="mb-3 col">
+                                                            <textarea id="content" rows="4" name="content"
+                                                                class="form-control border-dark"></textarea>
+                                                            <% if (data.errors && data.errors.content) { %>
+                                                                <small id="email-errors" class="text-danger">
+                                                                    <%= data.errors.content[0] %>
+                                                                </small>
+                                                                <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="d-flex justify-content-between">
+                                                                <button onclick="closeForm()" type="button"
+                                                                    class="btn btn-outline-dark col-3">
+                                                                    Cancel
+                                                                </button>
+                                                                <button type="submit" id="btn-submit"
+                                                                    class="btn btn-dark col-3">
+                                                                    Create
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </li>
                                 </div>
                                 <% data.publications.forEach(function(publication){ %>
-                                    <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
+                                    <li class="list-group-item my-2 border border-dark rounded">
                                         <div class="container">
                                             <div
                                                 class="row justify-content-between mb-2 align-items-center border-bottom border-gray">
@@ -168,78 +190,6 @@
         <%} %>
             <%{ script %>
                 <script>
-
-                    $('#btn-submit').on('click', () => {
-                        let title = $('#title').val();
-                        let content = $('#content').val();
-                        let categoryId = $('.category-option:checked').val();
-                        let userId = getFromLocalStorage('user').id;
-                        let groupId = <%= data.group.id %>;
-                        callPost('/publication', {
-                            title: title,
-                            content: content,
-                            user_id: userId,
-                            category_id: categoryId,
-                            group_id: groupId
-                        }, (status, data) => {
-                            switch (status) {
-                                case 201:
-                                    alert(data.message);
-                                    addNewPublication(data.body);
-                                    break;
-                                case 400:
-                                    handleVerifications(data);
-                                    break;
-                                default:
-                                    alert(data.message);
-                                    break;
-                            }
-                        });
-                    });
-
-                    function addNewPublication(publication) {
-                        $('#ul-publications').append(`
-                        <li class="list-group-item list-group-item-action my-2 border border-dark rounded">
-                                        <div class="container">
-                                            <div
-                                                class="row justify-content-between mb-2 align-items-center border-bottom border-gray">
-                                                <div class="col">
-                                                    <div class="row align-items-center">
-                                                        <div class="col-1 p-0 me-2">
-                                                            <img src="<%= host %>/icon.png" width="100alfalfa"
-                                                                height="100alfalfa">
-                                                        </div>
-                                                        <div class="col">
-                                                            <div class="row justify-content-between">
-                                                                <a class="text-dark h6"
-                                                                    href="/publications/${publication.user_id}">
-                                                                    ${publication.name +" "+ publication.lastname}
-                                                                </a>
-                                                                <small>
-                                                                    ${publication.created_at}
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class=" row overflow-auto text-justify">
-                                                                        <p>
-                                                                            ${publication.title}
-                                                                        </p>
-                                                            </div>
-                                                            <div class="row justify-content-end">
-                                                                <a class="col-3 btn btn-sm btn-dark"
-                                                                    href="/publication/${publication.id}"
-                                                                    role="button">
-                                                                    View publication
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                    </li>
-                        `);
-                    }
-
                     function openForm() {
                         $('#collapsed-form').addClass('show');
                         $('#btn-collapse-form').removeClass('show');
@@ -249,6 +199,10 @@
                         $('#collapsed-form').removeClass('show');
                         $('#btn-collapse-form').addClass('show');
                     }
+
+                    <% if (data.errors) { %>
+                        openForm();
+                                    <% } %>
 
                 </script>
                 <%} %>

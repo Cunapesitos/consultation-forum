@@ -8,8 +8,6 @@ class PublicationModel {
     create = async (data) => {
         return new Promise(async (resolve, reject) => {
             data.created_at = moment().format();
-            //console.log("Inserting user...");
-            //console.log(data);
             var query = connection.query('insert into publications set ?', data,
                 (error, results, fields) => {
                     if (error) {
@@ -17,9 +15,6 @@ class PublicationModel {
                         reject(error);
                     }
                     console.log("----------------------------------PUBLICATION CREATED----------------------------");
-                    //console.log("SQL executed:");
-                    //console.log(query.sql);
-                    //console.log("Query results");
                     console.log(results[0]);
                     data.id = results.insertId;
                     resolve(data);
@@ -37,17 +32,11 @@ class PublicationModel {
                         reject(error);
                     }
                     console.log("Publications found.");
-                    //console.log("SQL executed:");
-                    //console.log(query.sql);
-                    //console.log('results');
                     console.log(results);
                     Object.keys(results).map(function (key, indexA) {
                         Object.keys(results[indexA]).map(function (key, index) {
-                            //console.log(key);
                             if (key == 'created_at') {
                                 results[indexA][key] = moment(results[indexA][key]).locale('en').format('LLLL');
-                                //console.log("THIS IS CHANGED");
-                                //console.log(results[indexA][key]);
                             }
                         });
                     });
@@ -77,8 +66,8 @@ class PublicationModel {
     getFromGroupId = async (groupId) => {
         return new Promise(async (resolve, reject) => {
             var query = connection.query(`
-                select * from publications, users
-                where group_id = ? and publications.user_id=users.id`, groupId,
+                select publications.*, users.* from publications, users, grops
+                where grops.id = ? and publications.group_id=grops.id and publications.user_id = users.id `, groupId,
                 (error, results, fields) => {
                     if (error) {
                         console.log("Group error.");

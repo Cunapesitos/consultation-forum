@@ -61,6 +61,24 @@ class CategoryModel {
         });
     }
 
+    getFromPublicationId = async (publicationId) => {
+        return new Promise(async (resolve, reject) => {
+            var query = connection.query(`
+                select categories.* from categories, publications
+                where publications.id = ? 
+                    and categories.id = publications.category_id`, publicationId,
+                (error, results, fields) => {
+                    if (error) {
+                        console.log("Group category error.");
+                        reject(error);
+                    }
+                    console.log("Groups categories found.");
+                    console.log(results[0]);
+                    resolve(results[0]);
+                });
+        });
+    }
+
 }
 
 module.exports = CategoryModel;

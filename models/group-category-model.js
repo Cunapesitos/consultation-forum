@@ -5,11 +5,11 @@ var connection = require('../db/connection').Connection;
 
 class GroupCategoryModel {
 
-    createFromAPublication = async (publication_id, category) => {
+    createFromAGroup = async (group_id, category_id) => {
         return new Promise(async (resolve, reject) => {
             connection.query(`
                 INSERT INTO \`groups_categories\` (\`group_id\`, \`category_id\`) 
-                VALUES ('${publication_id}', '${category.id}');
+                VALUES ('${group_id}', '${category_id}');
             `, (error, results, fields) => {
                 if (error) {
                     console.log("Group category error.");
@@ -22,19 +22,18 @@ class GroupCategoryModel {
         });
     }
 
-    getFromPublicationId = async (publicationId) => {
+    getFromGroupId = async (groupId) => {
         return new Promise(async (resolve, reject) => {
-            var query = connection.query(
-                'select categories.* from publications_categories, categories where publication_id = ? and category_id = categories.id', publicationId,
+            var query = connection.query(`
+                select categories.* from groups_categories, categories
+                where group_id = ? 
+                    and categories.id = groups_categories.category_id`, groupId,
                 (error, results, fields) => {
                     if (error) {
-                        console.log("Publication category error.");
+                        console.log("Group category error.");
                         reject(error);
                     }
-                    console.log("Publications categories found.");
-                    //console.log("SQL executed:");
-                    //console.log(query.sql);
-                    //console.log('results');
+                    console.log("Groups categories found.");
                     console.log(results);
                     resolve(results);
                 });

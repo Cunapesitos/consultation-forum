@@ -69,17 +69,17 @@
                     </li>
                     <li class="ms-3 nav-item">
                         <div class="dropdown">
-                        <input id="search-users-input" class="form-control me-2" type="text"
-                            placeholder="Search users...">
-                        <ul id="users-result" class="dropdown-menu p-0 mx-auto"
-                            aria-labelledby="group-input-search">
-                        </ul>
-                    </div>
+                            <input id="search-users-input" class="form-control me-2" type="text"
+                                placeholder="Search users...">
+                            <ul id="users-result" class="dropdown-menu p-0 mx-auto"
+                                aria-labelledby="group-input-search">
+                            </ul>
+                        </div>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a onclick="logout()" class="nav-link" href="#">Logout</a>
+                        <a class="nav-link" href="/logout">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -98,147 +98,32 @@
         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
     <script>
-        let waiting;
-
-        function callPost(route, dataToSend, handleResponse, block = true) {
-            if (block) showSpinner();
-            let status;
-            let headersToSend = { 'Content-Type': 'application/json' };
-            let access_token = getFromLocalStorage('access_token');
-            if (access_token) headersToSend = {
-                'Content-Type': 'application/json',
-                'Authorization': access_token
-            };
-            //console.log("sending with headers: ");
-            //console.log(headersToSend);
-            fetch(route, {
-                method: 'POST',
-                headers: headersToSend,
-                body: JSON.stringify({ data: dataToSend })
-            }).then(response => {
-                status = response.status;
-                return response.json();
-            }).then(data => {
-                hideSpinner(); waiting = false;
-                if (status == 401) logout();
-                if (status == 404) {
-                    alert(data.message);
-                    window.location.href = "/publications/" + getFromLocalStorage('user').id;
-                }
-                else handleResponse(status, data);
-            }).catch((error) => {
-                hideSpinner();
-                alert(error.message);
-                console.error('Error:', error);
-            });
-        }
-
-        function callGet(route, handleResponse, block = true) {
-            if (block) showSpinner();
-            let status;
-            let headersToSend = { 'Content-Type': 'application/json' };
-            let access_token = getFromLocalStorage('access_token');
-            if (access_token) headersToSend = {
-                'Content-Type': 'application/json',
-                'Authorization': access_token
-            };
-            //console.log("sending with headers: ");
-            //console.log(headersToSend);
-            fetch(route, {
-                method: 'GET',
-                headers: headersToSend
-            }).then(response => {
-                status = response.status;
-                return response.json();
-            }).then(data => {
-                hideSpinner();
-                //console.log(data);
-                waiting = false;
-                if (status == 401) logout();
-                if (status == 404) {
-                    alert(data.message);
-                    window.location.href = "/publications/" + getFromLocalStorage('user').id;
-                }
-                else handleResponse(status, data);
-            }).catch((error) => {
-                hideSpinner();
-                alert(error.message);
-                //console.log(error);
-            });
-        }
-
-        function saveInLocalStorage(key, data) {
-            if (data)
-                localStorage.setItem(key, JSON.stringify(data));
-        }
-
-        function getFromLocalStorage(key) {
-            let data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : null;
-        }
-
-        function removeFromLocalStorage(key) {
-            localStorage.removeItem(key);
-        }
-
-        function showSpinner() {
-            $('#spinner').addClass('show');
-        }
-
-        function hideSpinner() {
-            $('#spinner').removeClass('show');
-        }
-
-        function logout() {
-            removeFromLocalStorage('access_token');
-            removeFromLocalStorage('user');
-            removeFromLocalStorage('back');
-            window.location.href = '/login'
-        }
-
-        function handleVerifications(data) {
-            //console.log(data);
-            Object.keys(data.body).map(function (key, index) {
-                let errors = data.body[key];
-                errors.forEach(element => {
-                    $(`#${key}-errors`).text("");
-                });
-                errors.forEach(element => {
-                    $(`#${key}-errors`).append(element);
-                    $(`#${key}-errors`).append('<br>');
-                });
-            });
-        }
-
-        if (getFromLocalStorage('access_token')) {
-            $('#my-publications-a').attr('href', `/publications/${getFromLocalStorage('user').id}`);
-            callGet('/me', (status, data) => {
-                if (status == 200) {
-                    let user = getFromLocalStorage('user');
-                    if (['/login', '/register'].indexOf(window.location.pathname) >= 0) {
-                        window.location.href = '/publications/' + user.id;
-                    }
-                    if (['/publications/' + user.id].indexOf(window.location.pathname) >= 0) {
-                        $('#master-back').removeClass('show');
-                    } else {
-                        $('#master-back').addClass('show');
-                    }
-                } else {
-                    logout();
-                }
-                $('#navbar').addClass('show');
-            });
-        } else {
+        <% if (user) { %>
+            $('#my-publications-a').attr('href', `/profile/<%= user.id %>`);
+            if (['/login', '/register'].indexOf(window.location.pathname) >= 0) {
+                window.location.href = '/profile/<%= user.id %>';
+            }
+            if (['/profile/<%= user.id %>'].indexOf(window.location.pathname) >= 0) {
+                $('#master-back').removeClass('show');
+            } else {
+                $('#master-back').addClass('show');
+            }
+            $('#navbar').addClass('show');
+        <% } else { %>
             if (['/login', '/register'].indexOf(window.location.pathname) < 0) {
                 window.location.href = '/login';
             }
             $('#navbar').removeClass('show');
             $('#master-back').removeClass('show');
-        }
+        <% } %>
 
-        $('#btn-cancel').on('click', () => {
-            window.history.back();
-        });
+            function showSpinner() {
+                $('#spinner').addClass('show');
+            }
+
+        function hideSpinner() {
+            $('#spinner').removeClass('show');
+        }
 
         $("input").keydown(function () {
             let id = $(this).attr('id');
@@ -255,43 +140,32 @@
             $(`#${id}-errors`).text("");
         });
 
-        $('#search-users-input').on('input', function () {
-            $('#search-users-input').dropdown();
-            $('#search-users-input').addClass('show');
-            $('#users-result').addClass('show');
-            let word = $(this).val();
-            if (!word) clearInput();
-            else setUsers('users-result', word);
-        });
-
         $(document).click(function (e) {
             if (!$('#users-result').is(e.target) && $('#users-result').has(e.target).length === 0) {// if div is not target nor its descendant
                 $('#users-result').removeClass('show');
             }
+            if (!$('#categories-result').is(e.target) && $('#categories-result').has(e.target).length === 0) {// if div is not target nor its descendant
+                $('#categories-result').removeClass('show');
+            }
+            if (!$('#groups-result').is(e.target) && $('#groups-result').has(e.target).length === 0) {// if div is not target nor its descendant
+                $('#groups-result').removeClass('show');
+            }
         });
 
-        function setUsers(id, word) {
-            callGet('/search/users/' + word, (status, data) => {
-                if (status == 200) {
-                    let users = data.body.users;
-                    $('#' + id).text('');
-                    if (users.length == 0) {
-                        $('#' + id).append(`
-                            <li><button class="dropdown-item">No results</button></li>
-                        `);
-                    }
-                    users.forEach(element => {
-                        $('#' + id).append(`
-                            <li class="justify-content-center">
-                                <button onclick="window.location.href='/publications/${element.id}'" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
-                                    ${element.name + " " + element.lastname}
-                                </button>
-                            </li>
-                        `);
-                    });
-                    $('#' + id).addClass('show');
-                }
-            }, false);
+        function callGet(route, handleResponse, block = true) {
+            let status;
+            let headersToSend = { 'Content-Type': 'application/json' };
+            fetch(route, {
+                method: 'GET',
+                headers: headersToSend
+            }).then(response => {
+                status = response.status;
+                return response.json();
+            }).then(data => {
+                handleResponse(status, data);
+            }).catch((error) => {
+                alert(error.message);
+            });
         }
 
     </script>

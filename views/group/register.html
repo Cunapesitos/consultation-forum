@@ -26,18 +26,27 @@
                             </div>
                             <div class="row mb-5 pb-4 align-items-center justify-content-center">
                                 <div class="col-8">
-                                    <div class="dropdown">
-                                        <input id="group-input-search" class="dropdown-toggle form-control border-dark" type="text"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                            placeholder="Search..." />
-                                        <ul id="groups-result" class="dropdown-menu p-0 overflow-auto"
-                                            aria-labelledby="group-input-search">
-                                        </ul>
+                                    <div class="container-fluid p-2">
+                                        <div class="row">
+                                            <form action="/search/groups" method="post" class="input-group">
+                                                <input type="text" id="word" name="word" class="form-control"
+                                                    placeholder="Group name..." aria-label="Recipient's username"
+                                                    aria-describedby="button-addon2">
+                                                <button class="btn btn-outline-dark" type="submit" id="button-addon2">
+                                                    Search
+                                                </button>
+                                            </form>
+                                            <% if (data.errors && data.errors.word) { %>
+                                                <small id="word-errors" class="text-danger">
+                                                    <%= data.errors.word[0] %>
+                                                </small>
+                                                <% } %>
+                                        </div>
                                     </div>
                                 </div>
                                 or...
                                 <div class="col">
-                                    <button class="btn btn-outline-dark"> View my groups</button>
+                                    <a class="btn btn-outline-dark" href="/groups/1"> View my groups</a>
                                 </div>
                             </div>
                             <div class="row my-2 border-bottom border-dark align-items-end ">
@@ -57,63 +66,62 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="mb-3 col-8">
-                                    <label class="form-label">Name</label>
-                                    <input type="text" id="name" class="form-control border-dark">
-                                    <small id="name-errors" class="text-danger"></small>
-                                </div>
-                                <div class="mb-3 col">
-                                    <label class="form-label">Categories</label>
-                                    <div class="dropdown">
-                                        <input id="input-search" class="dropdown-toggle form-control border-dark" type="text"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                            placeholder="Search..." />
-                                        <ul id="categories-result" class="dropdown-menu p-0"
-                                            aria-labelledby="input-search">
-                                        </ul>
+                            <form action="/group" method="post">
+                                <div class="row">
+                                    <div class="mb-3 col-8">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" name="name" id="name" class="form-control border-dark">
+                                        <% if (data.errors && data.errors.name) { %>
+                                            <small id="name-errors" class="text-danger"><%= data.errors.name[0] %></small>
+                                            <% } %>
                                     </div>
-                                    <small id="name-errors" class="text-danger"></small>
+                                    <div class="mb-3 col">
+                                        <label class="form-label">Categories</label>
+                                        <div class="dropdown">
+                                            <input id="categories" type="hidden" name="categories" value="">
+                                            <input type="hidden" name="user_id" value="<%= user.id %>">
+                                            <input id="input-search" class="dropdown-toggle form-control border-dark"
+                                                type="text" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false" placeholder="Search..." />
+                                            <ul id="categories-result" class="dropdown-menu p-0"
+                                                aria-labelledby="input-search">
+                                            </ul>
+                                        </div>
+                                        <small id="name-errors" class="text-danger"></small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="mb-3 col">
-                                    <label class="form-label">Categories</label>
-                                    <div>
-                                        <div class="row">
-                                            <div class="col" id="categories-selected"></div>
-                                            <small id="category_id-errors" class="text-danger"></small>
+                                <div class="row">
+                                    <div class="mb-3 col">
+                                        <label class="form-label">Categories</label>
+                                        <div>
+                                            <div class="row">
+                                                <div class="col" id="categories-selected"></div>
+                                                <% if (data.errors && data.errors.category_id) { %>
+                                                    <small id="category_id-errors" class="text-danger"><%= data.errors.category_id[0] %></small>
+                                                    <% } %>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="d-flex justify-content-between">
-                                        <button type="button" id="btn-cancel" class="btn btn-outline-dark">
-                                            Cancel
-                                        </button>
-                                        <button type="button" id="btn-submit" class="btn btn-dark col-3">
-                                            Create
-                                        </button>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" id="btn-cancel" class="btn btn-outline-dark">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" id="btn-submit" class="btn btn-dark col-3">
+                                                Create
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                     <%} %>
                         <%{ script %>
                             <script>
-                                $(document).click(function (e) {
-                                    if (!$('#categories-result').is(e.target) && $('#categories-result').has(e.target).length === 0) {// if div is not target nor its descendant
-                                        $('#categories-result').removeClass('show');
-                                    }
-                                    if (!$('#groups-result').is(e.target) && $('#groups-result').has(e.target).length === 0) {// if div is not target nor its descendant
-                                        $('#groups-result').removeClass('show');
-                                    }
-                                });
-
-                                saveInLocalStorage('groups-selected', []);
+                                localStorage.setItem('groups-selected', []);
 
                                 addCategory(0, '');
 
@@ -126,49 +134,16 @@
                                     else setCategories('categories-result', word);
                                 });
 
-                                $('#group-input-search').on('input', function () {
-                                    $('#group-input-search').addClass('show');
-                                    $('#group-input-search').dropdown();
-                                    $('#groups-result').addClass('show');
-                                    let word = $(this).val();
-                                    if (!word) clearInput();
-                                    else setGroups('groups-result', word);
-                                });
-
-                                $('#btn-submit').on('click', () => {
-                                    let name = $('#name').val();
-                                    let userId = getFromLocalStorage('user').id;
-                                    let categoriesSelected = getFromLocalStorage('categories-selected');
-                                    callPost('/group', {
-                                        name: name,
-                                        user_id: userId,
-                                        categories: categoriesSelected
-                                    }, (status, data) => {
-                                        switch (status) {
-                                            case 201:
-                                                alert(data.message);
-                                                window.location.href = '/group/' + data.body.id;
-                                                break;
-                                            case 400:
-                                                handleVerifications(data);
-                                                break;
-                                            default:
-                                                alert(data.message);
-                                                break;
-                                        }
-                                    });
-                                });
-
                                 function setCategories(id, word) {
-                                    let categoriesSelected = getFromLocalStorage('categories-selected');
+                                    let categoriesSelected = JSON.parse(localStorage.getItem('categories-selected'));
                                     callGet('/search/categories/' + word, (status, data) => {
                                         if (status == 200) {
                                             let categories = data.body.categories;
                                             $('#' + id).text('');
                                             if (categories.length == 0) {
                                                 $('#' + id).append(`
-                                                <li><button class="dropdown-item">No results</button></li>
-                                            `);
+                                            <li><button class="dropdown-item">No results</button></li>
+                                        `);
                                             }
                                             categories.forEach(element => {
                                                 let selected = false;
@@ -177,12 +152,12 @@
                                                 });
                                                 if (!selected)
                                                     $('#' + id).append(`
-                                                        <li class="justify-content-center">
-                                                            <button onclick="addCategory(${element.id},'${element.name}')" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
-                                                                ${element.name}
-                                                            </button>
-                                                        </li>
-                                                    `);
+                                                    <li class="justify-content-center">
+                                                        <a href="#" onclick="addCategory(${element.id},'${element.name}')" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
+                                                            ${element.name}
+                                                        </a>
+                                                    </li>
+                                                `);
                                             });
                                             $('#' + id).addClass('myShow show');
                                         }
@@ -191,18 +166,21 @@
 
                                 function addCategory(id, name) {
                                     clearInput();
-                                    let categoriesSelected = getFromLocalStorage('categories-selected');
+                                    let categoriesSelected = JSON.parse(localStorage.getItem('categories-selected'));
                                     if (id == 0) {
                                         $('#categories-selected').append(`
-                                            <div class="col">No categories selected</div>
-                                        `);
+                                        <div class="col">No categories selected</div>
+                                    `);
                                         categoriesSelected = [];
                                     }
                                     else {
                                         $('#categories-selected').text('');
                                         categoriesSelected.push({ id: id, name: name });
+                                        let val = $('#categories').val();
+                                        val += id + "-";
+                                        $('#categories').val(val);
                                     }
-                                    saveInLocalStorage('categories-selected', categoriesSelected);
+                                    localStorage.setItem('categories-selected', JSON.stringify(categoriesSelected));
                                     refreshCategoryList();
                                     $('#categories-result').removeClass('myShow show');
                                 }
@@ -211,40 +189,16 @@
                                     $('#input-search').val("");
                                     $('#input-search').text("");
                                     $('#input-search').append(`
-                                        <li><button class="dropdown-item">No results</button></li>
-                                    `);
-                                }
-
-                                function setGroups(id, word) {
-                                    callGet('/search/groups/' + word, (status, data) => {
-                                        if (status == 200) {
-                                            let groups = data.body.groups;
-                                            $('#' + id).text('');
-                                            if (groups.length == 0) {
-                                                $('#' + id).append(`
-                                                <li><button class="dropdown-item">No results</button></li>
-                                            `);
-                                            }
-                                            groups.forEach(element => {
-                                                $('#' + id).append(`
-                                                <li class="justify-content-center">
-                                                    <button onclick="window.location.href='/group/${element.id}'" class="dropdown-item badge bg-light text-dark border border-dark" id="${element.id}">
-                                                        ${element.name}
-                                                    </button>
-                                                </li>
-                                            `);
-                                            });
-                                            $('#' + id).addClass('show');
-                                        }
-                                    }, false);
+                                    <li><button class="dropdown-item">No results</button></li>
+                                `);
                                 }
 
                                 function refreshCategoryList() {
-                                    let categoriesSelected = getFromLocalStorage('categories-selected');
+                                    let categoriesSelected = JSON.parse(localStorage.getItem('categories-selected'));
                                     categoriesSelected.forEach(element => {
                                         $('#categories-selected').append(`
-                                            <span class="badge bg-light text-dark border border-dark" id="${element.id}">${element.name}</span>
-                                        `);
+                                        <span class="badge bg-light text-dark border border-dark" id="${element.id}">${element.name}</span>
+                                    `);
                                     });
                                 }
                             </script>

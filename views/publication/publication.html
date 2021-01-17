@@ -16,8 +16,7 @@
                                         </div>
                                         <div class="col">
                                             <div class="row justify-content-between">
-                                                <a class="text-dark h6"
-                                                    href="/publications/<%= data.publication.user_id %>">
+                                                <a class="text-dark h6" href="/profile/<%= data.publication.user_id %>">
                                                     <%= data.user.name +" "+ data.user.lastname %>
                                                     </a>
                                                     <small>
@@ -36,9 +35,9 @@
                                         </div>
                                         <div class="row">
                                             <div class="col">
-                                                <button class="badge bg-light text-dark border border-dark">
-                                                    <%= data.publication.name %>
-                                                </button>
+                                                <label class="badge bg-light text-dark border border-dark">
+                                                    <%= data.category.name %>
+                                                </label>
                                             </div>
                                         </div>
                     </li>
@@ -46,118 +45,60 @@
                 <div class="container h-100">
                     <div class="row align-items-top justify-content-center  overflow-auto">
                         <div class="col-11 mx-auto">
-                            <ul id="comment-list" class="list-group">
-                                <% data.comments.forEach(function(comment){ %>
-                                    <li class="list-group-item list-group-item-action my-2 border boder-info rounded">
-                                        <div class="container">
-                                            <div class="row justify-content-between border-bottom mb-3">
-                                                <a class="text-dark h6" href="/publications/<%= comment.user_id %>">
-                                                    <%= comment.name +" " + comment.lastname %>
-                                                    </a>
-                                                    <small class=" text-dark">
-                                                        <%= comment.created_at %>
-                                                            </small>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <p class="oldComment collapse show">
-                                                        <%= comment.content %>
-                                                    </p>
-                                                    <form class="row collapse" action="a" method="post">
-                                                        <input type="hidden" name="comment_id" value="asd">
-                                                        <textarea name="content" class="form-control"></textarea>
-                                                        <button class="badge bg-dark">
-                                                            Guardar
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <% }); %>
-                            </ul>
                             <ul class="list-group">
                                 <li class="list-group-item list-group-item-action my-2 border">
-                                    <div class="row align-items-center">
-                                        <input id="publication-id" type="hidden" name="publication_id"
-                                            value="<%= data.publication.id %>">
-                                        <div class="col-10">
-                                            <input type="text" id="comment-content" name="content"
-                                                placeholder="Escribe algo..." class="form-control">
+                                    <form action="/comment" method="post">
+                                        <input type="hidden" name="publication_id" value="<%= data.publication.id %>">
+                                        <input type="hidden" name="user_id" value="<%= user.id %>">
+                                        <div class="row align-items-center">
+                                            <div class="col-10">
+                                                <input type="text" id="comment-content" name="content"
+                                                    placeholder="Escribe algo..." class="form-control">
+                                            </div>
+                                            <div class="col">
+                                                <input id="btn-comment" class="btn btn-dark btn-sm" type="submit"
+                                                    value="Comentar">
+                                            </div>
+                                    </form>
+                        </div>
+                        </li>
+                        </ul>
+                        <ul id="comment-list" class="list-group">
+                            <% data.comments.forEach(function(comment){ %>
+                                <li class="list-group-item my-2 border boder-info rounded">
+                                    <div class="container">
+                                        <div class="row justify-content-between border-bottom mb-3">
+                                            <a class="text-dark h6" href="/profile/<%= comment.user_id %>">
+                                                <%= comment.name +" " + comment.lastname %>
+                                                    </a>
+                                                    <small class=" text-dark">
+                                                    <%= comment.created_at %>
+                                                        </small>
                                         </div>
-                                        <div class="col">
-                                            <input id="btn-comment" class="btn btn-dark btn-sm" type="submit"
-                                                value="Comentar">
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="oldComment collapse show">
+                                                    <%= comment.content %>
+                                                </p>
+                                                <form class="row collapse" action="a" method="post">
+                                                    <input type="hidden" name="comment_id" value="asd">
+                                                    <textarea name="content" class="form-control"></textarea>
+                                                    <button class="badge bg-dark">
+                                                        Guardar
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
-                            </ul>
-                        </div>
+                                <% }); %>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
+        </div>
         <%} %>
             <%{ script %>
-                <script>
-                    $('#btn-comment').on('click', () => {
-                        let content = $('#comment-content').val();
-                        $('#comment-content').val("");
-                        let publication_id = $('#publication-id').val();
-                        let user_id = getFromLocalStorage('user').id;
-                        callPost('/comment', {
-                            content: content,
-                            publication_id: publication_id,
-                            user_id: user_id,
-                        }, (status, data) => {
-                            switch (status) {
-                                case 201:
-                                    addToComments(data);
-                                    break;
-                                default:
-                                    alert(data.message);
-                                    break;
-                            }
-                        }, false);
-                    });
 
-                    function addToComments(data) {
-                        console.log(data);
-                        let user = getFromLocalStorage('user');
-                        let completeName = user.name + " " + user.lastname;
-                        let id = user.id;
-                        let createdAt = data.body.created_at;
-                        let content = data.body.content;
-                        $('#comment-list').append(`
-                        <li
-                            class="list-group-item list-group-item-action my-2 border boder-info rounded">
-                            <div class="container">
-                                <div class="row justify-content-between border-bottom mb-3">
-                                    <a class="text-dark h6" href="/publications/${id}">
-                                        ${completeName}
-                                    </a>
-                                    <small class="text-dark">
-                                        ${createdAt}
-                                    </small>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <p class="oldComment collapse show">
-                                            ${content}
-                                        </p>
-                                        <form class="row collapse" action="a" method="post">
-                                            <input type="hidden" name="comment_id" value="asd">
-                                            <textarea name="content"
-                                                class="form-control"></textarea>
-                                            <button class="badge bg-dark">
-                                                Guardar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    `);
-                    }
-                </script>
                 <%} %>
