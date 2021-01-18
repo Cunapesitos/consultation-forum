@@ -4,14 +4,12 @@ var Validator = require('Validator');
 var PublicationModel = require('../models/PublicationModel');
 var UserModel = require('../models/UserModel');
 var CommentModel = require('../models/CommentModel');
-var PublicationCategoryModel = require('../models/GroupCategoryModel');
 var CategoryModel = require('../models/CategoryModel');
 let pejs = require('pejs');
 var views = pejs();
 var user = new UserModel();
 var publication = new PublicationModel();
 var comment = new CommentModel();
-var publicationCategory = new PublicationCategoryModel();
 var category = new CategoryModel();
 var LocalStorage = require('node-localstorage').LocalStorage;
 var localStorage = new LocalStorage('./scratch');
@@ -133,22 +131,6 @@ class PublicationController {
             });
     }
 
-    getRequest = (req) => {
-        return new Promise((resolve, reject) => {
-            try {
-                let body = '';
-                req.on('data', (chunk) => {
-                    body += chunk.toString();
-                });
-                req.on('end', () => {
-                    let o = JSON.parse(body);
-                    resolve(o);
-                })
-            } catch (e) {
-                reject(e);
-            }
-        });
-    }
 }
 
 module.exports = PublicationController;
